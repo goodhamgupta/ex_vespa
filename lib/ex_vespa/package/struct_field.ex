@@ -83,4 +83,19 @@ defmodule ExVespa.Package.StructField do
     lname == rname and lindexing == rindexing and lattribute == rattribute and lmatch == rmatch and
       lquery_command == rquery_command and lsummary == rsummary
   end
+
+  @doc """
+  Returns the indexing list as a string
+
+  ## Examples
+
+    iex> ExVespa.Package.StructField.new("title", ["index1", "index2"], ["attribute"], ["match"], ["query_command"], %ExVespa.Package.Summary{name: "summary", type: "summary", fields: ["dynamic"]})
+    ...> |> ExVespa.Package.StructField.indexing_to_text()
+    "index1 | index2"
+  """
+  def indexing_to_text(%__MODULE__{indexing: []}), do: nil
+
+  def indexing_to_text(%__MODULE__{indexing: indexing}) when length(indexing) > 0 do
+    Enum.join(indexing, " | ")
+  end
 end
