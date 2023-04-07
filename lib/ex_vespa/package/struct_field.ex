@@ -38,6 +38,15 @@ defmodule ExVespa.Package.StructField do
 
     iex> ExVespa.Package.StructField.new("title", ["index"], ["attribute"], ["match"], ["query_command"], %ExVespa.Package.Summary{name: "summary", type: "summary", fields: ["dynamic"]})
     %ExVespa.Package.StructField{attribute: ["attribute"], indexing: ["index"], match: ["match"], name: "title", query_command: ["query_command"], summary: %ExVespa.Package.Summary{fields: ["dynamic"], name: "summary", type: "summary"}}
+
+    iex> ExVespa.Package.StructField.new("title", ["index"], ["attribute"], ["match"], ["query_command"], nil)
+    %ExVespa.Package.StructField{attribute: ["attribute"], indexing: ["index"], match: ["match"], name: "title", query_command: ["query_command"], summary: nil}
+
+    iex> ExVespa.Package.StructField.new("title", ["index"], ["attribute"], ["match"], ["query_command"], %ExVespa.Package.Summary{name: "summary", type: "summary", fields: ["dynamic"]})
+    %ExVespa.Package.StructField{attribute: ["attribute"], indexing: ["index"], match: ["match"], name: "title", query_command: ["query_command"], summary: %ExVespa.Package.Summary{fields: ["dynamic"], name: "summary", type: "summary"}}
+
+    iex> ExVespa.Package.StructField.new("title", ["index"], ["attribute"], ["match"], ["query_command"], %ExVespa.Package.Summary{name: "summary", type: "summary", fields: ["dynamic"]})
+    %ExVespa.Package.StructField{attribute: ["attribute"], indexing: ["index"], match: ["match"], name: "title", query_command: ["query_command"], summary: %ExVespa.Package.Summary{fields: ["dynamic"], name: "summary", type: "summary"}}
   """
   def new(name, indexing \\ [], attribute \\ [], match \\ [], query_command \\ [], summary \\ nil) do
     %__MODULE__{
@@ -92,6 +101,10 @@ defmodule ExVespa.Package.StructField do
     iex> ExVespa.Package.StructField.new("title", ["index1", "index2"], ["attribute"], ["match"], ["query_command"], %ExVespa.Package.Summary{name: "summary", type: "summary", fields: ["dynamic"]})
     ...> |> ExVespa.Package.StructField.indexing_to_text()
     "index1 | index2"
+
+    iex> ExVespa.Package.StructField.new("title", [], ["attribute"], ["match"], ["query_command"], %ExVespa.Package.Summary{name: "summary", type: "summary", fields: ["dynamic"]})
+    ...> |> ExVespa.Package.StructField.indexing_to_text()
+    nil
   """
   def indexing_to_text(%__MODULE__{indexing: []}), do: nil
 
