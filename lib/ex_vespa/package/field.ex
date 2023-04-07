@@ -1,5 +1,4 @@
 defmodule ExVespa.Package.Field do
-  alias ExVespa.Package.HNSW
   alias ExVespa.Package.{HNSW, Summary, Struct}
 
   alias __MODULE__
@@ -308,44 +307,44 @@ defmodule ExVespa.Package.Field do
       struct_fields: Map.get(opts, :struct_fields, nil)
     }
     |> validate()
+  end
 
-    def %Field{
-          name: lname,
-          type: ltype,
-          indexing: lindexing,
-          attribute: lattribute,
-          index: lindex,
-          ann: lann,
-          match: lmatch,
-          weight: lweight,
-          bolding: lbolding,
-          summary: lsummary,
-          stemming: lstemming,
-          rank: lrank,
-          query_command: lquery_command,
-          struct_fields: lstruct_fields
-        } = %Field{
-          name: rname,
-          type: rtype,
-          indexing: rindexing,
-          attribute: rattribute,
-          index: rindex,
-          ann: rann,
-          match: rmatch,
-          weight: rweight,
-          bolding: rbolding,
-          summary: rsummary,
-          stemming: rstemming,
-          rank: rrank,
-          query_command: rquery_command,
-          struct_fields: rstruct_fields
-        } do
-      lname == rname and ltype == rtype and lindexing == rindexing and
-        lattribute == rattribute and lindex == rindex and lann == rann and lmatch == rmatch and
-        lweight == rweight and lbolding == rbolding and lsummary == rsummary and
-        lstemming == rstemming and lrank == rrank and lquery_command == rquery_command and
-        lstruct_fields == rstruct_fields
-    end
+  def %Field{
+        name: lname,
+        type: ltype,
+        indexing: lindexing,
+        attribute: lattribute,
+        index: lindex,
+        ann: lann,
+        match: lmatch,
+        weight: lweight,
+        bolding: lbolding,
+        summary: lsummary,
+        stemming: lstemming,
+        rank: lrank,
+        query_command: lquery_command,
+        struct_fields: lstruct_fields
+      } = %Field{
+        name: rname,
+        type: rtype,
+        indexing: rindexing,
+        attribute: rattribute,
+        index: rindex,
+        ann: rann,
+        match: rmatch,
+        weight: rweight,
+        bolding: rbolding,
+        summary: rsummary,
+        stemming: rstemming,
+        rank: rrank,
+        query_command: rquery_command,
+        struct_fields: rstruct_fields
+      } do
+    lname == rname and ltype == rtype and lindexing == rindexing and
+      lattribute == rattribute and lindex == rindex and lann == rann and lmatch == rmatch and
+      lweight == rweight and lbolding == rbolding and lsummary == rsummary and
+      lstemming == rstemming and lrank == rrank and lquery_command == rquery_command and
+      lstruct_fields == rstruct_fields
   end
 
   def inspect(%Field{
