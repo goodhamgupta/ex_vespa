@@ -1,5 +1,5 @@
 defmodule ExVespa.Package.Field do
-  alias ExVespa.Package.{HNSW, Summary, Struct}
+  alias ExVespa.Package.{HNSW, Summary, Struct, StructField}
 
   alias __MODULE__
 
@@ -364,5 +364,58 @@ defmodule ExVespa.Package.Field do
         struct_fields: struct_fields
       }) do
     "Field(#{name}, #{type}, #{indexing}, #{attribute}, #{index}, #{ann}, #{match}, #{weight}, #{bolding}, #{summary}, #{stemming}, #{rank}, #{query_command}, #{struct_fields})"
+  end
+
+  def indexing_to_text(%Field{indexing: indexing}) do
+    Enum.join(indexing, " | ")
+  end
+
+  def struct_fields(%Field{struct_fields: struct_fields}) do
+    # TODO: Implement the _struct_fields attribute and return the values from that
+    struct_fields
+  end
+
+  @doc """
+  Adds a struct field to the field
+
+  ## Examples
+
+    iex> alias ExVespa.Package.{Field, StructField}
+    iex> field = Field.new("my_field", "string")
+    iex> struct_field = StructField.new("my_struct_field")
+    iex> Field.add_struct_fields(field, struct_field)
+    %Field{
+      name: "my_field",
+      type: "string",
+      indexing: nil,
+      attribute: nil,
+      index: nil,
+      ann: nil,
+      match: nil,
+      weight: nil,
+      bolding: nil,
+      summary: nil,
+      stemming: nil,
+      rank: nil,
+      query_command: nil,
+      struct_fields: [StructField.new("my_struct_field")]
+    }
+  """
+  def add_struct_fields(
+        %Field{struct_fields: struct_fields} = field,
+        %StructField{} = struct_field
+      )
+      when is_nil(struct_fields) do
+    %Field{
+      field
+      | struct_fields: [struct_field]
+    }
+  end
+
+  def add_struct_fields(%Field{} = field, %StructField{} = struct_field) do
+    %Field{
+      field
+      | struct_fields: field.struct_fields ++ [struct_field]
+    }
   end
 end
