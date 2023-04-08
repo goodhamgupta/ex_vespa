@@ -77,6 +77,7 @@ defmodule ExVespa.Package.Document do
       inherits: [],
       _structs: %{}
     }
+
   """
   def add_fields(document, fields) do
     %Document{
