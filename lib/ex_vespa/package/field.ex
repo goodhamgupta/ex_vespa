@@ -39,23 +39,23 @@ defmodule ExVespa.Package.Field do
           struct_fields: list(Struct.t())
         }
 
-  def validate(%__MODULE__{name: name}) when is_nil(name) do
+  defp validate(%__MODULE__{name: name}) when is_nil(name) do
     raise ArgumentError, "Name should not be nil"
   end
 
-  def validate(%__MODULE__{name: name}) when not is_binary(name) and not is_nil(name) do
+  defp validate(%__MODULE__{name: name}) when not is_binary(name) and not is_nil(name) do
     raise ArgumentError, "Name should be a string"
   end
 
-  def validate(%__MODULE__{type: type}) when is_nil(type) do
+  defp validate(%__MODULE__{type: type}) when is_nil(type) do
     raise ArgumentError, "Type should not be nil"
   end
 
-  def validate(%__MODULE__{type: type}) when not is_binary(type) and not is_nil(type) do
+  defp validate(%__MODULE__{type: type}) when not is_binary(type) and not is_nil(type) do
     raise ArgumentError, "Type should be a string"
   end
 
-  def validate(input), do: input
+  defp validate(input), do: input
 
   @doc """
   Creates a new field object

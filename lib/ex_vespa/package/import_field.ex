@@ -20,33 +20,33 @@ defmodule ExVespa.Package.ImportField do
           field_to_import: String.t()
         }
 
-  def validate(%__MODULE__{name: name}) when is_nil(name) do
+  defp validate(%__MODULE__{name: name}) when is_nil(name) do
     raise ArgumentError, "Name should not be nil"
   end
 
-  def validate(%__MODULE__{name: name}) when not is_binary(name) and not is_nil(name) do
+  defp validate(%__MODULE__{name: name}) when not is_binary(name) and not is_nil(name) do
     raise ArgumentError, "Name should be a string"
   end
 
-  def validate(%__MODULE__{reference_field: reference_field}) when is_nil(reference_field) do
+  defp validate(%__MODULE__{reference_field: reference_field}) when is_nil(reference_field) do
     raise ArgumentError, "Reference field should not be nil"
   end
 
-  def validate(%__MODULE__{reference_field: reference_field})
-      when not is_binary(reference_field) and not is_nil(reference_field) do
+  defp validate(%__MODULE__{reference_field: reference_field})
+       when not is_binary(reference_field) and not is_nil(reference_field) do
     raise ArgumentError, "Reference field should be a string"
   end
 
-  def validate(%__MODULE__{field_to_import: field_to_import}) when is_nil(field_to_import) do
+  defp validate(%__MODULE__{field_to_import: field_to_import}) when is_nil(field_to_import) do
     raise ArgumentError, "Field to import should not be nil"
   end
 
-  def validate(%__MODULE__{field_to_import: field_to_import})
-      when not is_binary(field_to_import) and not is_nil(field_to_import) do
+  defp validate(%__MODULE__{field_to_import: field_to_import})
+       when not is_binary(field_to_import) and not is_nil(field_to_import) do
     raise ArgumentError, "Field to import should be a string"
   end
 
-  def validate(input), do: input
+  defp validate(input), do: input
 
   @doc """
   Creates a new import field object

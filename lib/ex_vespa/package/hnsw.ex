@@ -13,12 +13,12 @@ defmodule ExVespa.Package.HNSW do
           neighbors_to_explore_at_insert: integer()
         }
 
-  def validate(%__MODULE__{distance_metric: distance_metric})
-      when not is_binary(distance_metric) do
+  defp validate(%__MODULE__{distance_metric: distance_metric})
+       when not is_binary(distance_metric) do
     raise ArgumentError, "Distance metric should be a string"
   end
 
-  def validate(input), do: input
+  defp validate(input), do: input
 
   @doc """
   Creates a new HNSW struct.

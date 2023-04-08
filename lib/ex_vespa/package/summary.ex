@@ -18,15 +18,15 @@ defmodule ExVespa.Package.Summary do
         }
 
   @spec validate(t()) :: t() | no_return()
-  def validate(%__MODULE__{name: name}) when not is_binary(name) and not is_nil(name) do
+  defp validate(%__MODULE__{name: name}) when not is_binary(name) and not is_nil(name) do
     raise ArgumentError, "Name should be a string"
   end
 
-  def validate(%__MODULE__{type: type}) when not is_binary(type) and not is_nil(type) do
+  defp validate(%__MODULE__{type: type}) when not is_binary(type) and not is_nil(type) do
     raise ArgumentError, "Type should be a string"
   end
 
-  def validate(input), do: input
+  defp validate(input), do: input
 
   @spec new(any, any, any) :: t() | no_return()
   def new(name, type, fields \\ []) do

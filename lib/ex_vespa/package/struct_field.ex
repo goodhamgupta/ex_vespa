@@ -21,15 +21,15 @@ defmodule ExVespa.Package.StructField do
           summary: Summary.t()
         }
 
-  def validate(%__MODULE__{name: name}) when is_nil(name) do
+  defp validate(%__MODULE__{name: name}) when is_nil(name) do
     raise ArgumentError, "Name should not be nil"
   end
 
-  def validate(%__MODULE__{name: name}) when not is_binary(name) and not is_nil(name) do
+  defp validate(%__MODULE__{name: name}) when not is_binary(name) and not is_nil(name) do
     raise ArgumentError, "Name should be a string"
   end
 
-  def validate(input), do: input
+  defp validate(input), do: input
 
   @doc """
   Create a new struct field object

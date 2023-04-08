@@ -33,7 +33,7 @@ defmodule ExVespa.Package do
         }
 
   @spec validate(__MODULE__.t()) :: {:ok, __MODULE__.t()} | no_return()
-  def validate(%__MODULE__{name: name}) do
+  defp validate(%__MODULE__{name: name}) do
     if Regex.match?(~r/^[a-zA-Z0-9_]+$/, name) do
       {:ok, %__MODULE__{name: name}}
     else
