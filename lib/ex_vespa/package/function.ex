@@ -90,4 +90,27 @@ defmodule ExVespa.Package.Function do
   @spec args_to_text(ExVespa.Package.Function.t()) :: String.t()
   def args_to_text(%Function{arguments: []}), do: ""
   def args_to_text(%Function{arguments: args}), do: "(#{Enum.join(args, ", ")})"
+
+  @doc """
+  Check if two instances of the Function module are equal
+
+  ## Examples
+
+    iex> ExVespa.Package.Function.new("my_function", "expression", ["arg1", "arg2"]) == ExVespa.Package.Function.new("my_function", "expression", ["arg1", "arg2"])
+    true
+
+    iex> ExVespa.Package.Function.new("my_function", "expression", ["arg1", "arg2"]) == ExVespa.Package.Function.new("my_function", "expression", ["arg1"])
+    false
+  """
+  def %Function{name: lname, expression: lexpression, arguments: larguments} = %Function{
+        name: rname,
+        expression: rexpression,
+        arguments: rarguments
+      } do
+    lname == rname and lexpression == rexpression and larguments == rarguments
+  end
+
+  def inspect(%Function{name: name, expression: expression, arguments: arguments}, _opts) do
+    "#{__MODULE__}(#{name}, #{expression}, #{arguments})"
+  end
 end
