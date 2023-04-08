@@ -53,4 +53,71 @@ defmodule ExVespa.Package.Document do
     }
     |> validate()
   end
+
+  @doc """
+  Adds fields to a document object
+
+  ## Examples
+
+    iex> alias ExVespa.Package.{Field, Document}
+    iex> Document.new()
+    ...> |> Document.add_fields([Field.new("my_field", "string")])
+    %ExVespa.Package.Document{
+      _fields: %{"my_field" => Field.new("my_field", "string")},
+      inherits: [],
+      _structs: %{}
+    }
+
+    iex> alias ExVespa.Package.{Field, Document}
+    iex> Document.new()
+    ...> |> Document.add_fields([Field.new("my_field", "string")])
+    ...> |> Document.add_fields([Field.new("my_field_again", "string")])
+    %ExVespa.Package.Document{
+      _fields: %{"my_field" => Field.new("my_field", "string"), "my_field_again" => Field.new("my_field_again", "string")},
+      inherits: [],
+      _structs: %{}
+    }
+  """
+  def add_fields(document, fields) do
+    %Document{
+      document
+      | _fields: Map.merge(document._fields, fields |> convert_list_to_map())
+    }
+  end
+
+  @doc """
+  Adds structs to a document object
+
+  ## Examples
+
+    iex> alias ExVespa.Package.{Struct, Document}
+    iex> Document.new()
+    ...> |> Document.add_structs([Struct.new("my_struct")])
+    %ExVespa.Package.Document{
+      _fields: %{},
+      inherits: [],
+      _structs: %{
+        "my_struct" => ExVespa.Package.Struct.new("my_struct")
+      }
+    }
+
+    iex> alias ExVespa.Package.{Struct, Document}
+    iex> Document.new()
+    ...> |> Document.add_structs([Struct.new("my_struct")])
+    ...> |> Document.add_structs([Struct.new("my_struct_again")])
+    %ExVespa.Package.Document{
+      _fields: %{},
+      inherits: [],
+      _structs: %{
+        "my_struct" => ExVespa.Package.Struct.new("my_struct"),
+        "my_struct_again" => ExVespa.Package.Struct.new("my_struct_again")
+      }
+    }
+  """
+  def add_structs(document, structs) do
+    %Document{
+      document
+      | _structs: Map.merge(document._structs, structs |> convert_list_to_map())
+    }
+  end
 end
