@@ -8,11 +8,15 @@ defmodule ExVespa.Package.OnnxModel do
   for more detailed information about field sets.
   """
 
+  alias __MODULE__
+
   @keys [
     :model_name,
     :model_file_path,
     :inputs,
-    :outputs
+    :outputs,
+    :model_file_name,
+    :file_path
   ]
 
   defstruct @keys
@@ -21,8 +25,11 @@ defmodule ExVespa.Package.OnnxModel do
           model_name: String.t(),
           model_file_path: String.t(),
           inputs: map(),
-          outputs: map()
+          outputs: map(),
+          model_file_name: String.t(),
+          file_path: String.t()
         }
+
   defp validate(%__MODULE__{model_name: model_name}) when is_nil(model_name) do
     raise ArgumentError, "model_name is required"
   end
@@ -86,7 +93,9 @@ defmodule ExVespa.Package.OnnxModel do
         },
         outputs: %{
           logits: "logits" 
-        }
+        },
+        model_file_name: "my_model.onnx",
+        file_path: "files/my_model.onnx"
       }
   """
   def new(model_name, model_file_path, inputs, outputs) do
@@ -94,8 +103,27 @@ defmodule ExVespa.Package.OnnxModel do
       model_name: model_name,
       model_file_path: model_file_path,
       inputs: inputs,
-      outputs: outputs
+      outputs: outputs,
+      model_file_name: "#{model_name}.onnx",
+      file_path: Path.join("files", "#{model_name}.onnx")
     }
     |> validate()
+  end
+
+  def %OnnxModel{
+        model_name: lmodel_name,
+        model_file_path: lmodel_file_path,
+        inputs: linputs,
+        outputs: loutputs
+      } = %OnnxModel{
+        model_name: rmodel_name,
+        model_file_path: rmodel_file_path,
+        inputs: rinputs,
+        outputs: routputs
+      } do
+    lmodel_name == rmodel_name and
+      lmodel_file_path == rmodel_file_path and
+      linputs == rinputs and
+      loutputs == routputs
   end
 end
