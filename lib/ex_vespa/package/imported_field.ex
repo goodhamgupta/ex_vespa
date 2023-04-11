@@ -1,4 +1,4 @@
-defmodule ExVespa.Package.ImportField do
+defmodule ExVespa.Package.ImportedField do
   @moduledoc """
   Imported field from a reference document
 
@@ -53,29 +53,29 @@ defmodule ExVespa.Package.ImportField do
 
   ## Examples
 
-      iex> ExVespa.Package.ImportField.new("my_field", "my_reference_field", "my_field_to_import")
-      %ExVespa.Package.ImportField{
+      iex> ExVespa.Package.ImportedField.new("my_field", "my_reference_field", "my_field_to_import")
+      %ExVespa.Package.ImportedField{
         name: "my_field",
         reference_field: "my_reference_field",
         field_to_import: "my_field_to_import"
       }
 
-      iex> ExVespa.Package.ImportField.new(nil, "my_reference_field", "my_field_to_import")
+      iex> ExVespa.Package.ImportedField.new(nil, "my_reference_field", "my_field_to_import")
       ** (ArgumentError) Name should not be nil
 
-      iex> ExVespa.Package.ImportField.new("my_field", nil, "my_field_to_import")
+      iex> ExVespa.Package.ImportedField.new("my_field", nil, "my_field_to_import")
       ** (ArgumentError) Reference field should not be nil
 
-      iex> ExVespa.Package.ImportField.new("my_field", "my_reference_field", nil)
+      iex> ExVespa.Package.ImportedField.new("my_field", "my_reference_field", nil)
       ** (ArgumentError) Field to import should not be nil
 
-      iex> ExVespa.Package.ImportField.new(123, "my_reference_field", 123)
+      iex> ExVespa.Package.ImportedField.new(123, "my_reference_field", 123)
       ** (ArgumentError) Name should be a string
 
-      iex> ExVespa.Package.ImportField.new("my_field", 123, "my_field_to_import")
+      iex> ExVespa.Package.ImportedField.new("my_field", 123, "my_field_to_import")
       ** (ArgumentError) Reference field should be a string
 
-      iex> ExVespa.Package.ImportField.new("my_field", "my_reference_field", 123)
+      iex> ExVespa.Package.ImportedField.new("my_field", "my_reference_field", 123)
       ** (ArgumentError) Field to import should be a string
 
   """

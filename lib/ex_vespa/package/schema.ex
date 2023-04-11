@@ -7,6 +7,7 @@ defmodule ExVespa.Package.Schema do
 
   alias ExVespa.Package.{
     Document,
+    Field,
     FieldSet,
     RankProfile,
     OnnxModel,
@@ -39,11 +40,11 @@ defmodule ExVespa.Package.Schema do
           imported_fields: [ImportedField.t()] | nil,
           document_summaries: [DocumentSummary.t()] | nil
         }
-  defp convert_list_to_map(input_list) when is_nil(input_list) do
-    []
+  defp convert_list_to_map(input_list) when is_map(input_list) do
+    input_list
   end
 
-  defp convert_list_to_map(input_list) do
+  defp convert_list_to_map(input_list) when is_list(input_list) do
     input_list
     |> Enum.map(fn x -> %{x.name => x} end)
     |> Enum.reduce(%{}, fn x, acc -> Map.merge(x, acc) end)
@@ -68,21 +69,21 @@ defmodule ExVespa.Package.Schema do
       iex> Schema.new("my_schema", Document.new())
       %ExVespa.Package.Schema{
         document: Document.new(),
-        fieldsets: [],
+        fieldsets: %{},
         global_document: false,
-        imported_fields: [],
+        imported_fields: %{},
         models: [],
         name: "my_schema",
-        rank_profiles: [],
+        rank_profiles: %{},
         document_summaries: []
       }
   """
   def new(name, document, opts \\ []) do
-    fieldsets = Keyword.get(opts, :fieldsets, nil)
-    rank_profiles = Keyword.get(opts, :rank_profiles, nil)
+    fieldsets = Keyword.get(opts, :fieldsets, %{})
+    rank_profiles = Keyword.get(opts, :rank_profiles, %{})
     models = Keyword.get(opts, :models, [])
     global_document = Keyword.get(opts, :global_document, false)
-    imported_fields = Keyword.get(opts, :imported_fields, nil)
+    imported_fields = Keyword.get(opts, :imported_fields, %{})
     document_summaries = Keyword.get(opts, :document_summaries, [])
 
     %__MODULE__{
@@ -98,7 +99,161 @@ defmodule ExVespa.Package.Schema do
     |> validate()
   end
 
-  def add_fields(%Schema{document: document} = schema, fields) do
-    %Schema{schema | document: document.fields ++ fields}
+  @doc """
+  Adds a field to a document
+
+  ## Examples
+
+      iex> alias ExVespa.Package.{Schema, Document, Field}
+      iex> schema = Schema.new("my_schema", Document.new())
+      iex> schema = Schema.add_fields(schema, Field.new("my_field", "string", %{indexing: ["attribute", "summary"]}))
+      iex> schema.document._fields
+      %{"my_field" => %ExVespa.Package.Field{
+          indexing: ["attribute", "summary"],
+          name: "my_field",
+          type: "string"
+        }
+      }
+  """
+
+  def add_fields(%Schema{document: document} = schema, %Field{} = fields) do
+    %Schema{schema | document: Document.add_fields(document, [fields])}
+  end
+
+  @doc """
+  Adds a fieldset to a document 
+
+  ## Examples
+
+      iex> alias ExVespa.Package.{Schema, Document, Field, FieldSet}
+      iex> schema = Schema.new("my_schema", Document.new())
+      iex> schema = Schema.add_field_set(schema, FieldSet.new("my_fieldset", ["title", "body"]))
+      iex> schema.fieldsets
+      %{"my_fieldset" => %ExVespa.Package.FieldSet{
+          fields: ["title", "body"],
+          name: "my_fieldset"
+        }
+      }
+  """
+  def add_field_set(%Schema{fieldsets: fieldsets} = schema, %FieldSet{} = fieldset) do
+    %Schema{schema | fieldsets: Map.put(fieldsets, fieldset.name, fieldset)}
+  end
+
+  @doc """
+  Adds a rank profile to a document
+
+  ## Examples
+
+      iex> alias ExVespa.Package.{Schema, Document, RankProfile}
+      iex> schema = Schema.new("my_schema", Document.new())
+      iex> rank_profile = RankProfile.new("default", "1.25 * bm25(title) + 3.75 * bm25(body)")
+      iex> schema = Schema.add_rank_profile(schema, rank_profile)
+      iex> schema.rank_profiles
+      %{"default" => %ExVespa.Package.RankProfile{
+          name: "default",
+          first_phase: "1.25 * bm25(title) + 3.75 * bm25(body)"
+        }
+      }
+  """
+
+  def add_rank_profile(
+        %Schema{rank_profiles: rank_profiles} = schema,
+        %RankProfile{} = rank_profile
+      ) do
+    %Schema{schema | rank_profiles: Map.put(rank_profiles, rank_profile.name, rank_profile)}
+  end
+
+  @doc """
+  Adds a model to a document
+
+  ## Examples
+
+      iex> alias ExVespa.Package.{Schema, Document, OnnxModel}
+      iex> schema = Schema.new("my_schema", Document.new())
+      iex> model = OnnxModel.new(
+      ...>   "my_model",
+      ...>   "model.onnx",
+      ...>   %{
+      ...>     input_ids: "input_ids",
+      ...>     token_type_ids: "token_type_ids",
+      ...>     attention_mask: "attention_mask",
+      ...>   },
+      ...>   %{
+      ...>     logits: "logits"
+      ...>   }
+      ...> )
+      iex> schema = Schema.add_model(schema, model)
+      iex> schema.models
+      [%ExVespa.Package.OnnxModel{
+        model_name: "my_model",
+        model_file_path: "model.onnx",
+        inputs: %{
+                    input_ids: "input_ids",
+                    token_type_ids: "token_type_ids",
+                    attention_mask: "attention_mask",
+                  },
+        outputs: %{
+                    logits: "logits" 
+                  },
+        model_file_name: "my_model.onnx",
+        file_path: "files/my_model.onnx"
+      }]
+  """
+  def add_model(%Schema{models: models} = schema, %OnnxModel{} = model) do
+    %Schema{schema | models: [model | models]}
+  end
+
+  @doc """
+  Adds a document summary to a document
+
+  ## Examples
+
+      iex> alias ExVespa.Package.{Schema, Document, DocumentSummary, Summary}
+      iex> schema = Schema.new("my_schema", Document.new())
+      iex> document_summary = DocumentSummary.new("my_summary", ["my_inherited_summary"], [Summary.new("my_field", "string")])
+      iex> schema = Schema.add_document_summary(schema, document_summary)
+      iex> schema.document_summaries
+      [%DocumentSummary{
+        name: "my_summary",
+        inherits: ["my_inherited_summary"],
+        summary_fields: [Summary.new("my_field", "string")],
+        from_disk: false,
+        omit_summary_fields: false
+      }]
+  """
+
+  def add_document_summary(
+        %Schema{document_summaries: document_summaries} = schema,
+        %DocumentSummary{} = document_summary
+      ) do
+    %Schema{schema | document_summaries: [document_summary | document_summaries]}
+  end
+
+  @doc """
+  Adds a imported field to a document
+
+  ## Examples
+
+      iex> alias ExVespa.Package.{Schema, Document, ImportedField}
+      iex> schema = Schema.new("my_schema", Document.new())
+      iex> imported_field = ImportedField.new("my_field", "my_reference_field", "my_field_to_import")
+      iex> schema = Schema.add_imported_field(schema, imported_field)
+      iex> schema.imported_fields
+      %{"my_field" => %ImportedField{
+          name: "my_field",
+          reference_field: "my_reference_field",
+          field_to_import: "my_field_to_import"
+        }
+      }
+  """
+
+  def add_imported_field(
+        %Schema{imported_fields: imported_fields} = schema,
+        %ImportedField{} = imported_field
+      ) do
+    %Schema{
+      schema
+      | imported_fields: Map.put(imported_fields, imported_field.name, imported_field)
+    }
   end
 end
