@@ -96,4 +96,43 @@ defmodule ExVespa.Package.QueryProfileType do
     }
     |> validate()
   end
+
+  def %QueryProfileType{name: lname, fields: lfields} =
+        lquery_profile_type =
+        %QueryProfileType{name: rname, fields: rfields} = rquery_profile_type do
+    lname == rname and lfields == rfields and lquery_profile_type == rquery_profile_type
+  end
+
+  @doc """
+  Add fields to a query profile type
+
+  ## Examples
+
+    iex> alias ExVespa.Package.{QueryProfileType, QueryTypeField}
+    iex> query_profile_type = QueryProfileType.new("root", [QueryTypeField.new("ranking.features.query(title_bert)", "tensor<float>(x[768])")])
+    iex> query_profile_type.fields
+    [%ExVespa.Package.QueryTypeField{
+      name: "ranking.features.query(title_bert)",
+      type: "tensor<float>(x[768])"
+    }]
+    iex> query_profile_type = QueryProfileType.add_fields(query_profile_type, [QueryTypeField.new("ranking.features.query(passage_bert)", "tensor<float>(x[768])")])
+    iex> query_profile_type.fields
+    [%ExVespa.Package.QueryTypeField{
+      name: "ranking.features.query(title_bert)",
+      type: "tensor<float>(x[768])"
+    }, %ExVespa.Package.QueryTypeField{
+      name: "ranking.features.query(passage_bert)",
+      type: "tensor<float>(x[768])"
+    }]
+  """
+  def add_fields(%QueryProfileType{fields: fields} = query_profile_type, new_fields) do
+    %QueryProfileType{
+      query_profile_type
+      | fields: fields ++ new_fields
+    }
+  end
+
+  def inspect(%QueryProfileType{name: name, fields: fields}, _opts) do
+    "#<ExVespa.Package.QueryProfileType(#{name}, #{inspect(fields)})"
+  end
 end
