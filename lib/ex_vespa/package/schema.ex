@@ -256,4 +256,77 @@ defmodule ExVespa.Package.Schema do
       | imported_fields: Map.put(imported_fields, imported_field.name, imported_field)
     }
   end
+
+  @doc """
+  Check if two Schema module objects are equal
+
+  ## Examples
+
+    iex> alias ExVespa.Package.{Schema, Document, FieldSet, RankProfile, OnnxModel, DocumentSummary, Summary, ImportedField}
+    iex> schema1 = Schema.new("my_schema", Document.new())
+    iex> schema2 = Schema.new("my_schema", Document.new())
+    iex> schema1 == schema2
+    true
+
+    iex> alias ExVespa.Package.{Schema, Document, FieldSet, RankProfile, OnnxModel, DocumentSummary, Summary, ImportedField}
+    iex> schema1 = Schema.new("my_schema", Document.new())
+    iex> schema2 = Schema.new("my_schema", Document.new())
+    iex> schema1 = Schema.add_field_set(schema1, FieldSet.new("my_fieldset", ["my_field"]))
+    iex> schema1 == schema2
+    false
+  """
+  def %Schema{
+        name: lname,
+        document: ldocument,
+        fieldsets: lfieldsets,
+        rank_profiles: lrank_profiles,
+        models: lmodels,
+        document_summaries: ldocument_summaries,
+        imported_fields: limported_fields
+      } = %Schema{
+        name: rname,
+        document: rdocument,
+        fieldsets: rfieldsets,
+        rank_profiles: rrank_profiles,
+        models: rmodels,
+        document_summaries: rdocument_summaries,
+        imported_fields: rimported_fields
+      } do
+    lname == rname and
+      ldocument == rdocument and
+      lfieldsets == rfieldsets and
+      lrank_profiles == rrank_profiles and
+      lmodels == rmodels and
+      ldocument_summaries == rdocument_summaries and
+      limported_fields == rimported_fields
+  end
+
+  def schema_to_text(%Schema{} = _schema) do
+    :not_implemented
+  end
+
+  def inspect(
+        %Schema{
+          name: name,
+          document: document,
+          fieldsets: fieldsets,
+          rank_profiles: rank_profiles,
+          models: models,
+          document_summaries: document_summaries,
+          imported_fields: imported_fields
+        },
+        _opts
+      ) do
+    """
+    Schema{
+      name: #{inspect(name)},
+      document: #{inspect(document)},
+      fieldsets: #{inspect(fieldsets)},
+      rank_profiles: #{inspect(rank_profiles)},
+      models: #{inspect(models)},
+      document_summaries: #{inspect(document_summaries)},
+      imported_fields: #{inspect(imported_fields)}
+    }
+    """
+  end
 end

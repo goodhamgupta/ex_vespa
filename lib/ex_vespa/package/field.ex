@@ -347,22 +347,25 @@ defmodule ExVespa.Package.Field do
       lstruct_fields == rstruct_fields
   end
 
-  def inspect(%Field{
-        name: name,
-        type: type,
-        indexing: indexing,
-        attribute: attribute,
-        index: index,
-        ann: ann,
-        match: match,
-        weight: weight,
-        bolding: bolding,
-        summary: summary,
-        stemming: stemming,
-        rank: rank,
-        query_command: query_command,
-        struct_fields: struct_fields
-      }) do
+  def inspect(
+        %Field{
+          name: name,
+          type: type,
+          indexing: indexing,
+          attribute: attribute,
+          index: index,
+          ann: ann,
+          match: match,
+          weight: weight,
+          bolding: bolding,
+          summary: summary,
+          stemming: stemming,
+          rank: rank,
+          query_command: query_command,
+          struct_fields: struct_fields
+        },
+        _opts
+      ) do
     "Field(#{name}, #{type}, #{indexing}, #{attribute}, #{index}, #{ann}, #{match}, #{weight}, #{bolding}, #{summary}, #{stemming}, #{rank}, #{query_command}, #{struct_fields})"
   end
 
