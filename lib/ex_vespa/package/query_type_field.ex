@@ -11,7 +11,6 @@ defmodule ExVespa.Package.QueryTypeField do
   ]
 
   defstruct @keys
-  
 
   @type t :: %QueryTypeField{
           name: String.t(),
@@ -44,33 +43,37 @@ defmodule ExVespa.Package.QueryTypeField do
   Create a new query type field
 
   ## Examples 
-  
-    iex> ExVespa.Package.QueryTypeField.new("ranking.features.query(title_bert)", "tensor<float>(x[768])")
-    %ExVespa.Package.QueryTypeField{
+
+    iex> alias ExVespa.Package.QueryTypeField
+    iex> QueryTypeField.new(nil, nil)
+    ** (ArgumentError) name is required
+
+    iex> alias ExVespa.Package.QueryTypeField
+    iex> QueryTypeField.new(1, "tensor<float>(x[768])")
+    ** (ArgumentError) name must be a string
+
+    iex> alias ExVespa.Package.QueryTypeField
+    iex> QueryTypeField.new("ranking.features.query(title_bert)", nil)
+    ** (ArgumentError) type is required
+
+    iex> alias ExVespa.Package.QueryTypeField
+    iex> QueryTypeField.new("ranking.features.query(title_bert)", 1)
+    ** (ArgumentError) type must be a string
+
+    iex> alias ExVespa.Package.QueryTypeField
+    iex> QueryTypeField.new("ranking.features.query(title_bert)", "tensor<float>(x[768])")
+    %QueryTypeField{
       name: "ranking.features.query(title_bert)",
       type: "tensor<float>(x[768])"
     }
-
-    iex> alias ExVespa.Package.QueryTypeField
-    iex> %QueryTypeField{name: nil}
-    ** (ArgumentError) name is required
-
-    iex> %QueryTypeField{type: nil}
-    ** (ArgumentError) type is required
-    
-    iex> %QueryTypeField{name: 1}
-    ** (ArgumentError) name must be a string
-
-    iex> %QueryTypeField{type: 1}
-    ** (ArgumentError) type must be a string
-
   """
   @spec new(String.t(), String.t()) :: t()
   def new(name, type) do
     %QueryTypeField{
       name: name,
       type: type
-    } |> validate()
+    }
+    |> validate()
   end
 
   def %QueryTypeField{name: lname, type: ltype} = %QueryTypeField{name: rname, type: rtype} do
@@ -80,5 +83,4 @@ defmodule ExVespa.Package.QueryTypeField do
   def inspect(%QueryTypeField{name: name, type: type}, _opts) do
     "ExVespa.Package.QueryTypeField(#{name}, #{type})"
   end
-
 end
