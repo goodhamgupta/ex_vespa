@@ -12,13 +12,11 @@ defmodule ExVespa.Package.ApplicationConfiguration do
   ]
 
   defstruct @keys
+  alias __MODULE__
 
-  @type t :: %__MODULE__{
+  @type t :: %ApplicationConfiguration{
           name: String.t(),
-          value:
-            String.t()
-            | map(String.t(), String.t())
-            | map(String.t(), map(String.t(), String.t()))
+          value: String.t() | map()
         }
 
   def validate(%ApplicationConfiguration{name: name}) when is_nil(name) do
@@ -43,10 +41,8 @@ defmodule ExVespa.Package.ApplicationConfiguration do
           value: "my_value"
       }
   """
-  @spec new(
-          String.t(),
-          String.t() | map(String.t(), String.t()) | map(String.t(), map(String.t(), String.t()))
-        ) :: %ApplicationConfiguration{}
+  @spec new(String.t(), String.t() | %{String.t() => String.t()} | %{String.t() => map()}) ::
+          %ApplicationConfiguration{}
   def new(name, value) do
     %ApplicationConfiguration{
       name: name,
@@ -67,14 +63,6 @@ defmodule ExVespa.Package.ApplicationConfiguration do
           value: "my_value"
       }
   """
-  @spec from_map(
-          map(
-            String.t(),
-            String.t()
-            | map(String.t(), String.t())
-            | map(String.t(), map(String.t(), String.t()))
-          )
-        ) :: %ApplicationConfiguration{}
   def from_map(%{name: name, value: value}) do
     new(name, value)
   end
@@ -90,33 +78,29 @@ defmodule ExVespa.Package.ApplicationConfiguration do
     lname == rname and lvalue == rvalue
   end
 
-  def to_text(%ApplicationConfiguration{name: name, value: value}) when is_binary(value) do
-    "    #{value}"
-  end
-
-  @doc """
-  Convert a ApplicationConfiguration to a text
-
-  ## Examples
-
-      iex> alias ExVespa.Package.ApplicationConfiguration
-      iex> ApplicationConfiguration.to_text(%ApplicationConfiguration{name: "my_config", value: "my_value"})
-      "    my_value"
-  """
-  def to_text(%ApplicationConfiguration{name: name, value: value}) when is_binary(value) do
+  def to_text(%ApplicationConfiguration{name: name, value: value}) do
     acc = "\n"
-    result = ApplicationConfiguration.convert_to_xml(value, 1, acc)
-    "    #{result}"
+
+    if is_binary(value) do
+      "<config name=#{name}>    <#{name}>#{value}</#{name}>\n</config>"
+    else
+      result = convert_to_xml(value, 1, acc)
+      "<config name=#{name}>    #{result}</config>"
+    end
   end
 
-  defp convert_to_xml(value, level \\ 1, acc) when is_map(value_map) do
-    Enum.flat_map(value_map, fn {key, value} ->
-      acc <> String.duplicate(" ", level * 4) <> "<#{key}>#{value}</#{key}>"
+  defp convert_to_xml(value, level, acc) when is_map(value) do
+    Enum.map(value, fn {key, value} ->
+      if is_map(value) do
+        acc <>
+          String.duplicate(" ", level * 4) <>
+          "<#{key}>\n" <>
+          convert_to_xml(value, level + 1, acc) <>
+          String.duplicate(" ", level * 4) <> "</#{key}>\n"
+      else
+        acc <> String.duplicate(" ", level * 4) <> "<#{key}>#{value}</#{key}>\n"
+      end
     end)
     |> Enum.join("\n")
-  end
-
-  defp convert_to_xml(value, level \\ 1, acc) do
-    acc <> String.duplicate(" ", level * 4) <> "<#{key}>#{value}</#{key}>"
   end
 end
