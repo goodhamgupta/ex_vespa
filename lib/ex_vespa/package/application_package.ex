@@ -155,4 +155,9 @@ defmodule ExVespa.Package.ApplicationPackage do
 
     %{application_package | schema: new_schema}
   end
+
+  def query_profile_to_text(%ApplicationPackage{query_profile: query_profile}) do
+    QueryProfile.to_text(query_profile)
+  end
+
 end
