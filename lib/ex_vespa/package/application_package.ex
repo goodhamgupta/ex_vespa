@@ -14,6 +14,8 @@ defmodule ExVespa.Package.ApplicationPackage do
     Validation
   }
 
+  alias ExVespa.Templates.QueryProfile, as: QueryProfileTemplate
+
   alias __MODULE__
 
   @keys [
@@ -85,11 +87,11 @@ defmodule ExVespa.Package.ApplicationPackage do
         validations: []                                                                                                                                                                            
     }
   """
-  def new(name, opts \\ %{}) do
+  def new(name, opts \\ []) do
     schema =
-      if Map.get(opts, :schema) == nil do
+      if Keyword.get(opts, :schema) == nil do
         interim =
-          if Map.get(opts, :create_schema_by_default, true) do
+          if Keyword.get(opts, :create_schema_by_default, true) do
             [Schema.new(name, Document.new())]
           else
             []
@@ -101,8 +103,8 @@ defmodule ExVespa.Package.ApplicationPackage do
       end
 
     query_profile =
-      if Map.get(opts, :query_profile) == nil do
-        if Map.get(opts, :create_query_profile_by_default, true) do
+      if Keyword.get(opts, :query_profile) == nil do
+        if Keyword.get(opts, :create_query_profile_by_default, true) do
           QueryProfile.new()
         else
           nil
@@ -112,8 +114,8 @@ defmodule ExVespa.Package.ApplicationPackage do
       end
 
     query_profile_type =
-      if Map.get(opts, :query_profile_type) == nil do
-        if Map.get(opts, :create_query_profile_by_default, true) do
+      if Keyword.get(opts, :query_profile_type) == nil do
+        if Keyword.get(opts, :create_query_profile_by_default, true) do
           QueryProfileType.new()
         else
           nil
@@ -127,13 +129,13 @@ defmodule ExVespa.Package.ApplicationPackage do
       schema: convert_list_to_map(schema),
       query_profile: query_profile,
       query_profile_type: query_profile_type,
-      model_ids: Map.get(opts, :model_ids, []),
-      model_configs: Map.get(opts, :model_configs, %{}),
-      stateless_model_evaluation: Map.get(opts, :stateless_model_evaluation, false),
-      create_schema_by_default: Map.get(opts, :create_schema_by_default, false),
-      create_query_profile_by_default: Map.get(opts, :create_query_profile_by_default, false),
-      configurations: Map.get(opts, :configurations, []),
-      validations: Map.get(opts, :validations, [])
+      model_ids: Keyword.get(opts, :model_ids, []),
+      model_configs: Keyword.get(opts, :model_configs, %{}),
+      stateless_model_evaluation: Keyword.get(opts, :stateless_model_evaluation, false),
+      create_schema_by_default: Keyword.get(opts, :create_schema_by_default, false),
+      create_query_profile_by_default: Keyword.get(opts, :create_query_profile_by_default, false),
+      configurations: Keyword.get(opts, :configurations, []),
+      validations: Keyword.get(opts, :validations, [])
     }
     |> validate()
   end
@@ -156,8 +158,26 @@ defmodule ExVespa.Package.ApplicationPackage do
     %{application_package | schema: new_schema}
   end
 
+  @doc ~S"""
+  Get query profile template as text
+
+  ## Examples
+  
+      iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document}
+      iex> app_package = ApplicationPackage.new("my_app")
+      iex> ApplicationPackage.query_profile_to_text(app_package)
+      ~s(<query-profile id=\"default\" type=\"root\">\n</query-profile>)
+
+      iex> # Test with fields in the query_profile
+      iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document, QueryProfile, QueryField}
+      iex> app_package = ApplicationPackage.new("my_app", query_profile: QueryProfile.new() |> QueryProfile.add_fields(
+      ...> [QueryField.new("field1", "string"), QueryField.new("field2", "string")]
+      ...> ))
+      iex> ApplicationPackage.query_profile_to_text(app_package)
+      ~s(<query-profile id=\"default\" type=\"root\">\n<field name=\"field1\">string</field>\n\n<field name=\"field2\">string</field>\n\n</query-profile>)
+  """
   def query_profile_to_text(%ApplicationPackage{query_profile: query_profile}) do
-    QueryProfile.to_text(query_profile)
+    QueryProfileTemplate.render(query_profile.fields)
   end
 
 end
