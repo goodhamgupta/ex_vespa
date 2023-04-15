@@ -15,6 +15,8 @@ defmodule ExVespa.Package.ApplicationPackage do
   }
 
   alias ExVespa.Templates.QueryProfile, as: QueryProfileTemplate
+  alias ExVespa.Templates.QueryProfileType, as: QueryProfileTypeTemplate
+  alias ExVespa.Templates.Services, as: ServicesTemplate
 
   alias __MODULE__
 
@@ -162,7 +164,7 @@ defmodule ExVespa.Package.ApplicationPackage do
   Get query profile template as text
 
   ## Examples
-  
+
       iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document}
       iex> app_package = ApplicationPackage.new("my_app")
       iex> ApplicationPackage.query_profile_to_text(app_package)
@@ -174,10 +176,56 @@ defmodule ExVespa.Package.ApplicationPackage do
       ...> [QueryField.new("field1", "string"), QueryField.new("field2", "string")]
       ...> ))
       iex> ApplicationPackage.query_profile_to_text(app_package)
-      ~s(<query-profile id=\"default\" type=\"root\">\n<field name=\"field1\">string</field>\n\n<field name=\"field2\">string</field>\n\n</query-profile>)
+      ~s(<query-profile id=\"default\" type=\"root\">\n<field name=\"field1\">string</field>\n<field name=\"field2\">string</field>\n</query-profile>)
   """
   def query_profile_to_text(%ApplicationPackage{query_profile: query_profile}) do
     QueryProfileTemplate.render(query_profile.fields)
   end
 
+  @doc ~S"""
+  Get query profile type template as text
+
+  ## Examples
+
+    iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document}
+    iex> app_package = ApplicationPackage.new("my_app")
+    iex> ApplicationPackage.query_profile_type_to_text(app_package)
+    ~s(<query-profile-type id=\"root\">\n</query-profile-type>)
+
+    iex> # Test with fields in the query_profile_type
+    iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document, QueryProfileType, QueryField}
+    iex> app_package = ApplicationPackage.new("my_app", query_profile_type: QueryProfileType.new() |> QueryProfileType.add_fields(
+    ...> [QueryField.new("field1", "string"), QueryField.new("field2", "string")]
+    ...> ))
+    iex> ApplicationPackage.query_profile_type_to_text(app_package)
+    ~s(<query-profile-type id=\"root\">\n<field name=\"field1\">string</field>\n<field name=\"field2\">string</field>\n</query-profile-type>)
+  """
+  def query_profile_type_to_text(%ApplicationPackage{query_profile_type: query_profile_type}) do
+    QueryProfileTypeTemplate.render(query_profile_type.fields)
+  end
+
+  @doc ~S"""
+  Get services as template text
+
+  ## Examples
+
+    iex> alias ExVespa.Package.ApplicationPackage
+    iex> app_package = ApplicationPackage.new("my_app")
+    iex> ApplicationPackage.services_to_text(app_package)
+    ~s(<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<services version=\"1.0\">\n\n\n    <container id=my_app_container version=\"1.0\">\n        <search></search>\n        <document-api></document-api>\n    </container>\n    <content id=my_app_content version=\"1.0\">\n        <redundancy reply-after=\"1\">1</redundancy>\n        <documents>\n         \n            <document type=\"my_app\" mode=\"index\"></document>\n        \n        </documents>\n        <nodes>\n            <node hostalias=\"node1\" distribution-key=\"0\"/>\n        </nodes>\n    </content>\n</services>)
+  """
+  def services_to_text(
+        %ApplicationPackage{
+          name: name,
+          configurations: configurations,
+          stateless_model_evaluation: stateless_model_evaluation
+        } = app_package
+      ) do
+    ServicesTemplate.render(
+      name,
+      ApplicationPackage.schemas(app_package),
+      configurations,
+      stateless_model_evaluation
+    )
+  end
 end

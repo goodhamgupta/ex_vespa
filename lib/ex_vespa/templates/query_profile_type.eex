@@ -1,0 +1,3 @@
+<query-profile-type id="root"><%= Enum.map(fields, fn field -> %>
+<%= "<field name=\"#{Map.get(field, :name)}\">#{Map.get(field, :value)}</field>" %><% end) %>
+</query-profile-type>

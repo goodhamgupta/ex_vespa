@@ -94,7 +94,7 @@ defmodule ExVespa.Package.ApplicationConfiguration do
       if is_map(value) do
         acc <>
           String.duplicate(" ", level * 4) <>
-          "<#{key}>\n" <>
+          "<#{key}>" <>
           convert_to_xml(value, level + 1, acc) <>
           String.duplicate(" ", level * 4) <> "</#{key}>\n"
       else
