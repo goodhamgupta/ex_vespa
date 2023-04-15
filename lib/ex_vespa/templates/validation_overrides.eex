@@ -1,0 +1,3 @@
+<validation-overrides><%= if validations != nil do %>
+    <%= Enum.map(validations, fn validation -> %><allow until="<%= validation.until %>" comment="<%= validation.comment %>"><%= validation.id %></allow><% end) %><% end %>
+</validation-overrides>

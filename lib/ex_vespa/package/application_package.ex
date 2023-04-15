@@ -17,6 +17,7 @@ defmodule ExVespa.Package.ApplicationPackage do
   alias ExVespa.Templates.QueryProfile, as: QueryProfileTemplate
   alias ExVespa.Templates.QueryProfileType, as: QueryProfileTypeTemplate
   alias ExVespa.Templates.Services, as: ServicesTemplate
+  alias ExVespa.Templates.Validations, as: ValidationsTemplate
 
   alias __MODULE__
 
@@ -227,5 +228,46 @@ defmodule ExVespa.Package.ApplicationPackage do
       configurations,
       stateless_model_evaluation
     )
+  end
+
+  @doc ~S"""
+  Get validations as template text
+
+  ## Examples
+
+    iex> alias ExVespa.Package.ApplicationPackage
+    iex> app_package = ApplicationPackage.new("my_app")
+    iex> ApplicationPackage.validations_to_text(app_package)
+    ~s(<validation-overrides>\n    \n</validation-overrides>)
+
+    iex> # Test with validations
+    iex> alias ExVespa.Package.{ApplicationPackage, Validation}
+    iex> app_package = ApplicationPackage.new("my_app", validations: [Validation.new(10, "2022-03-01", "test comment")])
+    iex> ApplicationPackage.validations_to_text(app_package)
+    ~s(<validation-overrides>\n    <allow until=\"2022-03-01\" comment=\"test comment\">10</allow>\n</validation-overrides>)
+  """
+  def validations_to_text(%ApplicationPackage{validations: validations}) do
+    ValidationsTemplate.render(validations)
+  end
+
+  def %ApplicationPackage{name: lname, schema: lschema} = %ApplicationPackage{
+        name: rname,
+        schema: rschema
+      } do
+    lname == rname and lschema == rschema
+  end
+
+  def inspect(
+        %ApplicationPackage{
+          name: name,
+          schema: schema,
+          query_profile: query_profile,
+          query_profile_type: query_profile_type
+        } = app_package,
+        _opts
+      ) do
+    schemas = ApplicationPackage.schemas(app_package)
+
+    "#ExVespa.Package.ApplicationPackage<name: #{name}, schemas: #{inspect(schemas)} query_profile: #{inspect(query_profile)} query_profile_type: #{inspect(query_profile_type)}>"
   end
 end
