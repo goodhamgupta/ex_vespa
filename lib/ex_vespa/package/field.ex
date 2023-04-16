@@ -369,6 +369,8 @@ defmodule ExVespa.Package.Field do
     "Field(#{name}, #{type}, #{indexing}, #{attribute}, #{index}, #{ann}, #{match}, #{weight}, #{bolding}, #{summary}, #{stemming}, #{rank}, #{query_command}, #{struct_fields})"
   end
 
+  def indexing_to_text(%Field{indexing: indexing}) when is_nil(indexing), do: ""
+
   def indexing_to_text(%Field{indexing: indexing}) do
     Enum.join(indexing, " | ")
   end

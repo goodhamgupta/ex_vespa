@@ -121,4 +121,21 @@ defmodule ExVespa.Package.Document do
       | _structs: Map.merge(document._structs, structs |> convert_list_to_map())
     }
   end
+
+  @doc """
+  Get all the stored fields in a document
+
+  ## Examples
+
+    iex> alias ExVespa.Package.{Field, Document}
+    iex> Document.new()
+    ...> |> Document.add_fields([Field.new("my_field", "string")])
+    ...> |> Document.add_fields([Field.new("my_field_again", "string")])
+    ...> |> Document.fields()
+    [
+      Field.new("my_field", "string"),
+      Field.new("my_field_again", "string")
+    ]
+  """
+  def fields(document), do: document._fields |> Map.values()
 end

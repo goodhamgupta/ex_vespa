@@ -260,7 +260,6 @@ defmodule ExVespa.Package.ApplicationPackage do
   def inspect(
         %ApplicationPackage{
           name: name,
-          schema: schema,
           query_profile: query_profile,
           query_profile_type: query_profile_type
         } = app_package,

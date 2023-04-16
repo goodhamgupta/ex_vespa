@@ -15,6 +15,7 @@ defmodule ExVespa.Package.Schema do
     DocumentSummary
   }
 
+  alias ExVespa.Templates.Schema, as: SchemaTemplate
   alias __MODULE__
 
   @keys [
@@ -301,8 +302,8 @@ defmodule ExVespa.Package.Schema do
       limported_fields == rimported_fields
   end
 
-  def schema_to_text(%Schema{} = _schema) do
-    :not_implemented
+  def schema_to_text(%Schema{} = schema) do
+    SchemaTemplate.render(schema)
   end
 
   def inspect(
