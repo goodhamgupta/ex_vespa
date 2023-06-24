@@ -1,4 +1,4 @@
-<% alias ExVespa.Package.{Document, Field} %>schema <%= schema.name %> {
+<% alias ExVespa.Package.{Summary, Document, Field} %>schema <%= schema.name %> {
     document <%= if schema.document.inherits, do: "#{schema.name}" %> {
         <%= Enum.map(Document.fields(schema.document), fn field -> %>field <%= field.name %> type <%= field.type %> {
             <%= if field.indexing, do: "indexing: #{Field.indexing_to_text(field)}" %><%= if field.index do %>
@@ -10,13 +10,15 @@
             }<% end %><%= if (field.ann != nil and field.ann == true) or (field.attribute != nil) do %>
             index {
                 hnsw {
-                    max-links-per-node: <%= field.ann.max_links_per_node %>
-                    neighbors-to-explore-at-insert: <%= field.ann.neighbors_to_explore_at_insert %>
+                  max-links-per-node: <%= field.ann[:hnsw][:max_links_per_node] %>
+                  neighbors-to-explore-at-insert: <%= field.ann[:hnsw][:neighbors_to_explore_at_insert] %>
                 }
             }<% end %><%= if field.match do %>
-            match {<%= Enum.map(field.match, fn {first, second} = match -> if is_binary(match), do: "#{match}\n", else: "#{first}:#{second}\n" end) %>}<% end %>
-            }
-            <% end) %>
+            match {<%= Enum.map(field.match, fn record = record -> if is_binary(record), do: "#{record}\n", else: "#{List.first(record)}:#{List.last(record)}\n" end)%>}<% end %>
+            }<%= if field.weight do %>
+            weight: <%= field.weight %><% end %><%= if field.bolding do %>
+            bolding: on<% end%><%= if field.summary do %><%= Enum.map(Summary.as_lines(field.summary), fn line -> "\n#{line}" end) %><% end %>
+        <% end) %>
         }
     }
 }

@@ -1,4 +1,4 @@
-defmodule ExVespa.Package.ApplicationPackageTest do
+defmodule ExVespa.Package.HNSWTest do
   use ExUnit.Case, async: true
-  doctest ExVespa.Package.ApplicationPackage
+  doctest ExVespa.Package.HNSW
 end

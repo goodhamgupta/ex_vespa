@@ -302,6 +302,38 @@ defmodule ExVespa.Package.Schema do
       limported_fields == rimported_fields
   end
 
+  @doc ~S"""
+  Returns a string representation of the schema.
+
+  ## Examples
+
+    iex> alias ExVespa.Package.{Schema, Document, Field, FieldSet, StructField, RankProfile, OnnxModel, DocumentSummary, Summary, ImportedField, Function, SecondPhaseRanking}
+    iex> cur_field = Field.new("my_field", "string", %{indexing: ["attribute", "summary"], attribute: ["fast-search"], index: "enable-bm25", ann: %{hnsw: %{max_links_per_node: 16, neighbors_to_explore_at_insert: 500}}, match: ["exact", "substring"], weight: 10, bolding: true, summary: Summary.new("summary", "string"), stemming: "true", rank: "bm25", query_command: "my_query_command", struct_fields: [StructField.new("structfield")]})
+    iex> schema = Schema.new("my_schema", Document.new([cur_field]))
+    iex> rank_profile = RankProfile.new("default", "1.25 * bm25(title) + 3.75 * bm25(body)", "default", %{c1: 1.0}, [Function.new("f1", "x + 1")], ["summary_feature"], SecondPhaseRanking.new("expression"))
+    iex> schema = Schema.add_field_set(schema, FieldSet.new("my_fieldset", ["my_field"]))
+    iex> schema = Schema.add_rank_profile(schema, rank_profile)
+    iex> alias ExVespa.Package.OnnxModel
+    iex> onnx_model = OnnxModel.new(
+    ...>   "my_model",
+    ...>   "model.onnx",
+    ...>   %{
+    ...>     input_ids: "input_ids",
+    ...>     token_type_ids: "token_type_ids",
+    ...>     attention_mask: "attention_mask",
+    ...>   },
+    ...>   %{
+    ...>     logits: "logits"
+    ...>   }
+    ...> )
+    iex> schema = Schema.add_model(schema, onnx_model)
+    iex> doc_summary = DocumentSummary.new("my_summary", ["my_inherited_summary"], [Summary.new("my_field", "string")])
+    iex> schema = Schema.add_document_summary(schema, doc_summary)
+    iex> imported_field = ImportedField.new("my_field", "my_reference_field", "my_field_to_import")
+    iex> schema = Schema.add_imported_field(schema, imported_field)
+    iex> Schema.schema_to_text(schema)
+    ~s(schema my_schema {\n    document my_schema {\n        field my_field type string {\n            indexing: attribute | summary\n            index: enable-bm25\n            \n            attribute {\n                fast-search\n\n            }\n            index {\n                hnsw {\n                  max-links-per-node: 16\n                  neighbors-to-explore-at-insert: 500\n                }\n            }\n            match {exact\nsubstring\n}\n            }\n            weight: 10\n            bolding: on\nsummary summary type string {}\n        \n        }\n    }\n}\n)
+  """
   def schema_to_text(%Schema{} = schema) do
     SchemaTemplate.render(schema)
   end

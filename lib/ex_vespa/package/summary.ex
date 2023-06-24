@@ -59,18 +59,18 @@ defmodule ExVespa.Package.Summary do
 
     iex> ExVespa.Package.Summary.new(nil, nil, ["dynamic"])
     ...> |> ExVespa.Package.Summary.as_lines()
-    {:ok, ["summary: dynamic"]}
+    ["summary: dynamic"]
 
     iex> ExVespa.Package.Summary.new("artist", "string", [{"bolding", "on"}, {"sources", "artist"}])
     ...> |> ExVespa.Package.Summary.as_lines()
-    {:ok, ["summary artist type string {", ["    bolding: on"], ["    sources: artist"], "}"]}
+    ["summary artist type string {", ["    bolding: on"], ["    sources: artist"], "}"]
 
   """
   @spec as_lines(t()) :: {:ok, [...]}
   def as_lines(%__MODULE__{name: name, type: type, fields: fields})
       when fields == ["dynamic"] and is_nil(name) and is_nil(type) do
     # Special case of `summary: dynamic` and others.
-    {:ok, ["summary: dynamic"]}
+    ["summary: dynamic"]
   end
 
   def as_lines(%__MODULE__{name: name, type: type, fields: fields}) do
@@ -95,7 +95,7 @@ defmodule ExVespa.Package.Summary do
         ["#{starting_string} {"] ++ field_list ++ ["}"]
       end
 
-    {:ok, result}
+    result
   end
 
   defp do_map_fields(fields) do

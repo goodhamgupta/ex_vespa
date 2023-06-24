@@ -18,6 +18,7 @@ defmodule ExVespa.Package.ApplicationPackage do
   alias ExVespa.Templates.QueryProfileType, as: QueryProfileTypeTemplate
   alias ExVespa.Templates.Services, as: ServicesTemplate
   alias ExVespa.Templates.Validations, as: ValidationsTemplate
+  alias ExVespa.Templates.Schema, as: SchemaTemplate
 
   alias __MODULE__
 
