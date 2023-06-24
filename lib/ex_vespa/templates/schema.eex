@@ -1,4 +1,4 @@
-<% alias ExVespa.Package.{Summary, Document, Field} %>schema <%= schema.name %> {
+<% alias ExVespa.Package.{Summary, Document, Field, StructField} %>schema <%= schema.name %> {
     document <%= if schema.document.inherits, do: "#{schema.name}" %> {
         <%= Enum.map(Document.fields(schema.document), fn field -> %>field <%= field.name %> type <%= field.type %> {
             <%= if field.indexing, do: "indexing: #{Field.indexing_to_text(field)}" %><%= if field.index do %>
@@ -15,9 +15,17 @@
                 }
             }<% end %><%= if field.match do %>
             match {<%= Enum.map(field.match, fn record = record -> if is_binary(record), do: "#{record}\n", else: "#{List.first(record)}:#{List.last(record)}\n" end)%>}<% end %>
-            }<%= if field.weight do %>
-            weight: <%= field.weight %><% end %><%= if field.bolding do %>
-            bolding: on<% end%><%= if field.summary do %><%= Enum.map(Summary.as_lines(field.summary), fn line -> "\n#{line}" end) %><% end %>
+            }
+            <%= if field.weight do "weight: #{field.weight}" end %>
+            <%= if field.bolding do "bolding: on"  end%>
+            <%= if field.summary do %><%= Enum.map(Summary.as_lines(field.summary), fn line -> "\n#{line}" end) %><% end %>
+            <%= if field.stemming do "stemming: #{field.stemming}" end %>
+            <%= if field.rank do "rank: #{field.rank}" end %>
+            <%= if field.query_command do Enum.map(field.query_command, fn qc -> "query-command: #{qc}" end) end %>
+            <%= if field.struct_fields do Enum.map(field.struct_fields, fn sf -> 
+            if sf.indexing do "indexing: #{StructField.indexing_to_text(sf)}" end 
+            if sf.attribute do Enum.map(sf.attribute, fn attribute -> "\n#{attribute}" end) end
+            end) end %>
         <% end) %>
         }
     }
