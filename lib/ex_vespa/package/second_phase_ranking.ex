@@ -39,7 +39,7 @@ defmodule ExVespa.Package.SecondPhaseRanking do
 
     iex> ExVespa.Package.SecondPhaseRanking.new(1)
     ** (ArgumentError) Second phase ranking expression must be a string
-    
+
     iex> ExVespa.Package.SecondPhaseRanking.new("1.25 * bm25(title) + 3.75 * bm25(body)")
     %ExVespa.Package.SecondPhaseRanking{expression: "1.25 * bm25(title) + 3.75 * bm25(body)", rerank_count: 100}
 

@@ -1,7 +1,7 @@
 <% alias ExVespa.Package.{Document, Field} %>schema <%= schema.name %> {
     document <%= if schema.document.inherits, do: "#{schema.name}" %> {
         <%= Enum.map(Document.fields(schema.document), fn field -> %>field <%= field.name %> type <%= field.type %> {
-            <%= if field.indexing, do: "indexing: #{Field.indexing_to_text(field)}" %><%= if field.index do %> 
+            <%= if field.indexing, do: "indexing: #{Field.indexing_to_text(field)}" %><%= if field.index do %>
             <%="index: #{field.index}" %><% end %>
             <%= if (field.ann != nil and field.ann == true) or (field.attribute != nil) do %>
             attribute {<%= if (field.ann != nil and field.ann == true) do %>

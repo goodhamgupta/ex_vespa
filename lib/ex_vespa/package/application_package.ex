@@ -74,20 +74,20 @@ defmodule ExVespa.Package.ApplicationPackage do
 
     iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document}
     iex> ApplicationPackage.new("my_app")
-    %ApplicationPackage{                                                                                                                                                         
-        configurations: [],                                                                                                                                                                        
-        create_query_profile_by_default: false,                                                                                                                                                    
-        create_schema_by_default: false,                                                                                                                                                           
-        model_configs: %{},                                                                                                                                                                        
-        model_ids: [],                                                                                                                                                                             
-        name: "my_app",                                                                                                                                                                            
-        query_profile: %ExVespa.Package.QueryProfile{name: "default", type: "root", fields: []},                                                                                                   
-        query_profile_type: %ExVespa.Package.QueryProfileType{name: "root", fields: []},                                                                                                           
-        schema: %{                                                                                                                                                                                 
-        "my_app" => %ExVespa.Package.Schema{name: "my_app", document: %ExVespa.Package.Document{_fields: %{}, inherits: [], _structs: %{}}, fieldsets: %{}, rank_profiles: %{}, models: [], global_document: false, imported_fields: %{}, document_summaries: []}                                                                                                                                         
-        },                                                                                                                                                                                         
-        stateless_model_evaluation: false,                                                                                                                                                         
-        validations: []                                                                                                                                                                            
+    %ApplicationPackage{
+        configurations: [],
+        create_query_profile_by_default: false,
+        create_schema_by_default: false,
+        model_configs: %{},
+        model_ids: [],
+        name: "my_app",
+        query_profile: %ExVespa.Package.QueryProfile{name: "default", type: "root", fields: []},
+        query_profile_type: %ExVespa.Package.QueryProfileType{name: "root", fields: []},
+        schema: %{
+        "my_app" => %ExVespa.Package.Schema{name: "my_app", document: %ExVespa.Package.Document{_fields: %{}, inherits: [], _structs: %{}}, fieldsets: %{}, rank_profiles: %{}, models: [], global_document: false, imported_fields: %{}, document_summaries: []}
+        },
+        stateless_model_evaluation: false,
+        validations: []
     }
   """
   def new(name, opts \\ []) do
@@ -146,7 +146,7 @@ defmodule ExVespa.Package.ApplicationPackage do
   @doc """
   List all schemas in the application package
 
-  ## Examples 
+  ## Examples
 
     iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document}
     iex> app_package = ApplicationPackage.new("my_app")
@@ -213,7 +213,7 @@ defmodule ExVespa.Package.ApplicationPackage do
     iex> alias ExVespa.Package.ApplicationPackage
     iex> app_package = ApplicationPackage.new("my_app")
     iex> ApplicationPackage.services_to_text(app_package)
-    ~s(<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<services version=\"1.0\">\n\n\n    <container id=my_app_container version=\"1.0\">\n        <search></search>\n        <document-api></document-api>\n    </container>\n    <content id=my_app_content version=\"1.0\">\n        <redundancy reply-after=\"1\">1</redundancy>\n        <documents>\n         \n            <document type=\"my_app\" mode=\"index\"></document>\n        \n        </documents>\n        <nodes>\n            <node hostalias=\"node1\" distribution-key=\"0\"/>\n        </nodes>\n    </content>\n</services>)
+    ~s(<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<services version=\"1.0\">\n\n\n    <container id=my_app_container version=\"1.0\">\n        <search></search>\n        <document-api></document-api>\n    </container>\n    <content id=my_app_content version=\"1.0\">\n        <redundancy reply-after=\"1\">1</redundancy>\n        <documents>\n        \n            <document type=\"my_app\" mode=\"index\"></document>\n        \n        </documents>\n        <nodes>\n            <node hostalias=\"node1\" distribution-key=\"0\"/>\n        </nodes>\n    </content>\n</services>\n)
   """
   def services_to_text(
         %ApplicationPackage{

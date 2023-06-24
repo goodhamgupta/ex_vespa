@@ -122,7 +122,7 @@ defmodule ExVespa.Package.Schema do
   end
 
   @doc """
-  Adds a fieldset to a document 
+  Adds a fieldset to a document
 
   ## Examples
 
@@ -194,7 +194,7 @@ defmodule ExVespa.Package.Schema do
                     attention_mask: "attention_mask",
                   },
         outputs: %{
-                    logits: "logits" 
+                    logits: "logits"
                   },
         model_file_name: "my_model.onnx",
         file_path: "files/my_model.onnx"

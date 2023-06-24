@@ -10,7 +10,7 @@
     <content id=<%= application_name %>_content version="1.0">
         <redundancy reply-after="1">1</redundancy>
         <documents>
-        <%= Enum.map(schemas, fn schema -> %> 
+        <%= Enum.map(schemas, fn schema -> %>
             <%= if schema.global_document do %><document type="<%= schema.name %>" mode="index" global="true"></document>
             <% else %><document type="<%= schema.name %>" mode="index"></document><% end %>
         <% end) %>
