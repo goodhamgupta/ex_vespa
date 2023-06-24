@@ -22,10 +22,24 @@
             <%= if field.stemming do "stemming: #{field.stemming}" end %>
             <%= if field.rank do "rank: #{field.rank}" end %>
             <%= if field.query_command do Enum.map(field.query_command, fn qc -> "query-command: #{qc}" end) end %>
-            <%= if field.struct_fields do Enum.map(field.struct_fields, fn sf -> 
-            if sf.indexing do "indexing: #{StructField.indexing_to_text(sf)}" end 
-            if sf.attribute do Enum.map(sf.attribute, fn attribute -> "\n#{attribute}" end) end
-            end) end %>
+            <%= if field.struct_fields do Enum.map(field.struct_fields, fn sf -> %>
+            struct-field {
+              <%= if sf.indexing do "indexing: #{StructField.indexing_to_text(sf)}" end %>
+              <%= if sf.attribute do %>
+              attribute {
+                <%= Enum.map(sf.attribute, fn attribute -> "\n#{attribute}" end) %>
+              }
+              <% end %>
+              <%= if sf.match do %>
+              match {<%= Enum.map(sf.match, fn record = record -> if is_binary(record), do: "#{record}\n", else: "#{List.first(record)}:#{List.last(record)}\n" end)%>}<% end %>
+              }
+              <%= if sf.query_command do Enum.map(sf.query_command, fn qc -> "query-command: #{qc}" end) end %>
+              <%= if sf.summary do %>
+              summary {
+                <%= if sf.summary.name do sf.summary.name end %><%= if sf.summary.type do "type: #{sf.summary.type}" end %>
+              }<% end%>
+              <% end) end %>
+            }
         <% end) %>
         }
     }
