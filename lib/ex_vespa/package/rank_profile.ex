@@ -17,7 +17,11 @@ defmodule ExVespa.Package.RankProfile do
     :constants,
     :functions,
     :summary_features,
-    :second_phase
+    :second_phase,
+    :weight,
+    :rank_type,
+    :rank_properties,
+    :inputs
   ]
 
   defstruct @keys
@@ -29,7 +33,11 @@ defmodule ExVespa.Package.RankProfile do
           constants: Map.t() | nil,
           functions: list(Function.t()) | nil,
           summary_features: list(String.t()) | nil,
-          second_phase: SecondPhaseRanking.t() | nil
+          second_phase: SecondPhaseRanking.t() | nil,
+          weight: list(Tuple.t()) | nil,
+          rank_type: list(Tuple.t()) | nil,
+          rank_properties: list(Tuple.t()) | nil,
+          inputs: list(Tuple.t()) | nil,
         }
 
   defp validate(%RankProfile{name: name}) when is_nil(name) do
@@ -101,7 +109,11 @@ defmodule ExVespa.Package.RankProfile do
         constants \\ nil,
         functions \\ nil,
         summary_features \\ nil,
-        second_phase \\ nil
+        second_phase \\ nil,
+        weight \\ nil,
+        rank_type \\ nil,
+        rank_properties \\ nil,
+        inputs \\ nil
       ) do
     %RankProfile{
       name: name,
@@ -110,7 +122,11 @@ defmodule ExVespa.Package.RankProfile do
       constants: constants,
       functions: functions,
       summary_features: summary_features,
-      second_phase: second_phase
+      second_phase: second_phase,
+      weight: weight,
+      rank_type: rank_type,
+      rank_properties: rank_properties,
+      inputs: inputs
     }
     |> validate()
   end
@@ -122,7 +138,11 @@ defmodule ExVespa.Package.RankProfile do
         constants: lconstants,
         functions: lfunctions,
         summary_features: lsummary_features,
-        second_phase: lsecond_phase
+        second_phase: lsecond_phase,
+        weight: lweight,
+        rank_type: lrank_type,
+        rank_properties: lrank_properties,
+        inputs: linputs
       } = %RankProfile{
         name: rname,
         first_phase: rfirst_phase,
@@ -130,7 +150,11 @@ defmodule ExVespa.Package.RankProfile do
         constants: rconstants,
         functions: rfunctions,
         summary_features: rsummary_features,
-        second_phase: rsecond_phase
+        second_phase: rsecond_phase,
+        weight: rweight,
+        rank_type: rrank_type,
+        rank_properties: rrank_properties,
+        inputs: rinputs
       } do
     lname == rname and
       lfirst_phase == rfirst_phase and
@@ -138,7 +162,11 @@ defmodule ExVespa.Package.RankProfile do
       lconstants == rconstants and
       lfunctions == rfunctions and
       lsummary_features == rsummary_features and
-      lsecond_phase == rsecond_phase
+      lsecond_phase == rsecond_phase and
+      lweight == rweight and
+      lrank_type == rrank_type and
+      lrank_properties == rrank_properties and
+      linputs == rinputs
   end
 
   def inspect(
@@ -149,10 +177,14 @@ defmodule ExVespa.Package.RankProfile do
           constants: constants,
           functions: functions,
           summary_features: summary_features,
-          second_phase: second_phase
+          second_phase: second_phase,
+          weight: weight,
+          rank_type: rank_type,
+          rank_properties: rank_properties,
+          inputs: inputs
         },
         _opts
       ) do
-    "RankProfile.new(\"#{name}\", \"#{first_phase}\", #{inspect(inherits)}, #{inspect(constants)}, #{inspect(functions)}, #{inspect(summary_features)}, #{inspect(second_phase)})"
+    "RankProfile.new(\"#{name}\", \"#{first_phase}\", #{inspect(inherits)}, #{inspect(constants)}, #{inspect(functions)}, #{inspect(summary_features)}, #{inspect(second_phase)}, #{inspect(weight)}, #{inspect(rank_type)}, #{inspect(rank_properties)}, #{inspect(inputs)})"
   end
 end

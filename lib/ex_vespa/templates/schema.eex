@@ -1,4 +1,4 @@
-<% alias ExVespa.Package.{Summary, Document, Field, StructField, FieldSet} %>schema <%= schema.name %> {
+<% alias ExVespa.Package.{Summary, Document, Field, StructField, FieldSet, Function} %>schema <%= schema.name %> {
     document <%= if schema.document.inherits, do: "#{schema.name}" %> {
         <%= Enum.map(Document.fields(schema.document), fn field -> %>field <%= field.name %> type <%= field.type %> {
             <%= if field.indexing, do: "indexing: #{Field.indexing_to_text(field)}" %><%= if field.index do %>
@@ -103,6 +103,30 @@
   }
   <% end) %>
 <% end %>
+<%= Enum.map(schema.rank_profiles, fn {key, value} -> 
+%> rank-profile <%= key %> <%= if value.inherits do value.inherits end %>{
+  <%= if value.constants do %>
+    constants {
+      <%= Enum.map(value.constants, fn {constant_key, constant_value} -> "#{constant_key}: #{constant_value}\n" end) %>
+    }
+  <% end %>
+  <%= if value.inputs do %>
+    inputs {
+      <%= Enum.map(value.inputs, fn input_value -> "#{input_value[0]}: #{input_value[1]}\n" end) %>
+    }
+  <% end %>
+  <%= if value.functions do %>
+  functions {<%= Enum.map(value.functions, fn function -> %>
+    function <%= function.name %>(<%= Function.args_to_text(function) %>) {
+      expression {
+        <%= function.expression %>
+      }
+    }
+  <% end) %>
+  }
+  <% end %>
+}
+<% end) %>
 <%= Enum.map(schema.document_summaries, fn document_summary -> %>
   document-summary <%= document_summary.name %> <%= if document_summary.inherits do "inherits #{document_summary.inherits}" end%>  {
   <%= if document_summary.summary_fields do %>
