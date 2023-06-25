@@ -138,4 +138,6 @@ defmodule ExVespa.Package.Document do
     ]
   """
   def fields(document), do: document._fields |> Map.values()
+
+  def structs(document), do: document._structs |> Map.values()
 end

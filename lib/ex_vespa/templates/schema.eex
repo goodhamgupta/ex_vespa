@@ -38,6 +38,25 @@
               summary {
                 <%= if sf.summary.name do sf.summary.name end %><%= if sf.summary.type do "type: #{sf.summary.type}" end %>
               }<% end%>
+              <%= Enum.map(schema.document |> Document.structs(), fn struct -> %>
+              struct {
+                <%= Enum.map(struct.fields, fn field -> %>
+                  field <%= field.name %> type <%= field.type %> {
+                    <%= if field.indexing do "indexing: #{Field.indexing_to_text(field)}" end %>
+                    <%= if field.index do "index: #{field.index}" end %>
+                    <%= if field.ann or field.attribute do %>
+                    attribute {
+                      <%= if field.ann do %>
+                      distance-metric: <%= field.ann.hnsw.distance_metric %>
+                      <% end %>
+                      <%= if field.attribute do %>
+                      <%= Enum.map(field.attribute, fn attr -> "#{attr}\n" end) %>
+                      <% end %>
+                    }
+                    <% end %>
+                  }
+                <% end) %>
+              }<% end) %>
               <% end) end %>
             }
         <% end) %>
