@@ -82,4 +82,20 @@
         <% end) %>
         }
     }
+<%= Enum.map(schema.imported_fields, fn {key, value} -> %>
+  import field <%= value.reference_field %>.<%= value.field_to_import %> as <%= "#{key} {}" %>
+<% end) %>
+<%= if schema.models do %>
+  <%= Enum.map(schema.models, fn model -> %>
+  onnx-model <%= model.model_name %> {
+    file: <%= model.file_path %>
+    <%= Enum.map(model.inputs, fn {key_input, value_input} -> %>
+      input <%= "#{key_input}: #{value_input}" %>
+    <% end) %>
+    <%= Enum.map(model.outputs, fn {key_output, value_output} -> %>
+      output <%= "#{key_output}: #{value_output}" %>
+    <% end) %>
+  }
+  <% end) %>
+<% end %>
 }
