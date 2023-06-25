@@ -7,26 +7,19 @@ defmodule ExVespa.Package.Struct do
   for more detailed information about structs.
   """
   alias ExVespa.Package.Summary
+  alias ExVespa.Package.Field
   alias __MODULE__
 
   @keys [
     :name,
-    :indexing,
-    :attribute,
-    :match,
-    :query_command,
-    :summary
+    :fields
   ]
 
   defstruct @keys
 
   @type t() :: %Struct{
           name: String.t(),
-          indexing: list(String.t()),
-          attribute: list(String.t()),
-          match: list(String.t()) | list({String.t(), String.t()}),
-          query_command: list(String.t()),
-          summary: Summary.t()
+          fields: list(Field.t())
         }
 
   def validate(%Struct{name: name}) when is_nil(name) do
@@ -44,37 +37,46 @@ defmodule ExVespa.Package.Struct do
 
   ## Examples
 
-    iex> ExVespa.Package.Struct.new("my_struct", ["indexing"], ["attribute"], ["match"], ["query_command"], ExVespa.Package.Summary.new("my_field", "string"))
+    iex> alias ExVespa.Package.Struct
+    iex> struct = Struct.new("my_struct")
     %ExVespa.Package.Struct{
-      name: "my_struct",
-      indexing: ["indexing"],
-      attribute: ["attribute"],
-      match: ["match"],
-      query_command: ["query_command"],
-      summary: ExVespa.Package.Summary.new("my_field", "string")
+      fields: [],
+      name: "my_struct"
     }
 
-    iex> ExVespa.Package.Struct.new(nil)
-    ** (ArgumentError) Name should not be nil
+    # Add fields to struct
+    iex> alias ExVespa.Package.{Struct, Field}
+    iex> struct = Struct.new("my_struct", [Field.new("my_field", "string")])
+    %ExVespa.Package.Struct{
+      fields: [
+        %ExVespa.Package.Field{
+          ann: nil,
+          attribute: nil,
+          bolding: nil,
+          index: nil,
+          indexing: nil,
+          match: nil,
+          name: "my_field",
+          query_command: nil,
+          rank: nil,
+          stemming: nil,
+          struct_fields: nil,
+          summary: nil,
+          type: "string",
+          weight: nil
+        }
+      ],
+      name: "my_struct"
+    }
 
-    iex> ExVespa.Package.Struct.new(1)
-    ** (ArgumentError) Name should be a string
   """
   def new(
         name,
-        indexing \\ [],
-        attribute \\ [],
-        match \\ [],
-        query_command \\ [],
-        summary \\ nil
+        fields \\ []
       ) do
     %Struct{
       name: name,
-      indexing: indexing,
-      attribute: attribute,
-      match: match,
-      query_command: query_command,
-      summary: summary
+      fields: fields
     }
     |> validate()
   end
