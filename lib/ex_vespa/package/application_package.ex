@@ -18,7 +18,6 @@ defmodule ExVespa.Package.ApplicationPackage do
   alias ExVespa.Templates.QueryProfileType, as: QueryProfileTypeTemplate
   alias ExVespa.Templates.Services, as: ServicesTemplate
   alias ExVespa.Templates.Validations, as: ValidationsTemplate
-  alias ExVespa.Templates.Schema, as: SchemaTemplate
 
   alias __MODULE__
 
@@ -167,13 +166,13 @@ defmodule ExVespa.Package.ApplicationPackage do
 
   ## Examples
 
-      iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document}
+      iex> alias ExVespa.Package.{ApplicationPackage}
       iex> app_package = ApplicationPackage.new("my_app")
       iex> ApplicationPackage.query_profile_to_text(app_package)
       ~s(<query-profile id=\"default\" type=\"root\">\n</query-profile>)
 
       iex> # Test with fields in the query_profile
-      iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document, QueryProfile, QueryField}
+      iex> alias ExVespa.Package.{ApplicationPackage, QueryProfile, QueryField}
       iex> app_package = ApplicationPackage.new("my_app", query_profile: QueryProfile.new() |> QueryProfile.add_fields(
       ...> [QueryField.new("field1", "string"), QueryField.new("field2", "string")]
       ...> ))
@@ -189,13 +188,13 @@ defmodule ExVespa.Package.ApplicationPackage do
 
   ## Examples
 
-    iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document}
+    iex> alias ExVespa.Package.{ApplicationPackage}
     iex> app_package = ApplicationPackage.new("my_app")
     iex> ApplicationPackage.query_profile_type_to_text(app_package)
     ~s(<query-profile-type id=\"root\">\n</query-profile-type>)
 
     iex> # Test with fields in the query_profile_type
-    iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document, QueryProfileType, QueryField}
+    iex> alias ExVespa.Package.{ApplicationPackage, QueryProfileType, QueryField}
     iex> app_package = ApplicationPackage.new("my_app", query_profile_type: QueryProfileType.new() |> QueryProfileType.add_fields(
     ...> [QueryField.new("field1", "string"), QueryField.new("field2", "string")]
     ...> ))

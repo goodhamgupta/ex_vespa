@@ -41,36 +41,40 @@
               <%= Enum.map(schema.document |> Document.structs(), fn struct -> %>
 
               struct <%= struct.name %> {
-                <%= Enum.map(struct.fields, fn field -> %>
-                  field <%= field.name %> type <%= field.type %> {
-                    <%= if field.indexing do "indexing: #{Field.indexing_to_text(field)}" end %>
-                    <%= if field.index do "index: #{field.index}" end %>
-                    <%= if field.ann != nil or field.attribute != nil do %>
+                <%= Enum.map(struct.fields, fn struct_field -> %>
+                  field <%= struct_field.name %> type <%= struct_field.type %> {
+                    <%= if struct_field.indexing do "indexing: #{struct_field.indexing_to_text(struct_field)}" end %>
+                    <%= if struct_field.index do "index: #{struct_field.index}" end %>
+                    <%= if struct_field.ann != nil or struct_field.attribute != nil do %>
                     attribute {
-                      <%= if field.ann do %>
-                      distance-metric: <%= field.ann.hnsw.distance_metric %>
+                      <%= if struct_field.ann do %>
+                      distance-metric: <%= struct_field.ann.hnsw.distance_metric %>
                       <% end %>
-                      <%= if field.attribute do %>
-                      <%= Enum.map(field.attribute, fn attr -> "#{attr}\n" end) %>
+                      <%= if struct_field.attribute do %>
+                      <%= Enum.map(struct_field.attribute, fn attr -> "#{attr}\n" end) %>
                       <% end %>
                     }
                     <% end %>
-                    <%= if field.ann do %>
+                    <%= if struct_field.ann do %>
                     index {
                       hnsw {
-                        max-links-per-node: <%= field.ann.hnsw.max_links_per_node %>
-                        neighbors-to-explore-at-insert: <%= field.ann.hnsw.neighbors_to_explore_at_insert %>
+                        max-links-per-node: <%= struct_field.ann.hnsw.max_links_per_node %>
+                        neighbors-to-explore-at-insert: <%= struct_field.ann.hnsw.neighbors_to_explore_at_insert %>
                       }
                     }
                     <% end %>
-                    <%= if field.match do %>
+                    <%= if struct_field.match do %>
                     match {
-                      <%= Enum.map(field.match, fn record = record -> if is_binary(record), do: "#{record}\n", else: "#{List.first(record)}:#{List.last(record)}\n" end) %>
+                      <%= Enum.map(struct_field.match, fn record = record -> if is_binary(record), do: "#{record}\n", else: "#{List.first(record)}:#{List.last(record)}\n" end) %>
                     }
                     <% end %>
                   }
-                  <%= if field.weight do "weight: #{field.weight}" end %>
-                  <%= if field.bolding do "bolding: on" end %>
+                  <%= if struct_field.weight do "weight: #{struct_field.weight}" end %>
+                  <%= if struct_field.bolding do "bolding: on" end %>
+                  <%= if struct_field.summary do %><%= Enum.map(Summary.as_lines(struct_field.summary), fn line -> "\n#{line}" end) %><% end %>
+                  <%= if struct_field.stemming do "stemming: #{struct_field.stemming}" end %>
+                  <%= if struct_field.rank do "rank: #{struct_field.rank}" end %>
+                  <%= if struct_field.query_command do "query-command: #{struct_field.query_command}" end %>
                 <% end) %>
               }<% end) %>
               <% end) end %>
