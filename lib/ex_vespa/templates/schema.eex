@@ -39,12 +39,13 @@
                 <%= if sf.summary.name do sf.summary.name end %><%= if sf.summary.type do "type: #{sf.summary.type}" end %>
               }<% end%>
               <%= Enum.map(schema.document |> Document.structs(), fn struct -> %>
-              struct {
+
+              struct <%= struct.name %> {
                 <%= Enum.map(struct.fields, fn field -> %>
                   field <%= field.name %> type <%= field.type %> {
                     <%= if field.indexing do "indexing: #{Field.indexing_to_text(field)}" end %>
                     <%= if field.index do "index: #{field.index}" end %>
-                    <%= if field.ann or field.attribute do %>
+                    <%= if field.ann != nil or field.attribute != nil do %>
                     attribute {
                       <%= if field.ann do %>
                       distance-metric: <%= field.ann.hnsw.distance_metric %>
@@ -54,7 +55,22 @@
                       <% end %>
                     }
                     <% end %>
+                    <%= if field.ann do %>
+                    index {
+                      hnsw {
+                        max-links-per-node: <%= field.ann.hnsw.max_links_per_node %>
+                        neighbors-to-explore-at-insert: <%= field.ann.hnsw.neighbors_to_explore_at_insert %>
+                      }
+                    }
+                    <% end %>
+                    <%= if field.match do %>
+                    match {
+                      <%= Enum.map(field.match, fn record = record -> if is_binary(record), do: "#{record}\n", else: "#{List.first(record)}:#{List.last(record)}\n" end) %>
+                    }
+                    <% end %>
                   }
+                  <%= if field.weight do "weight: #{field.weight}" end %>
+                  <%= if field.bolding do "bolding: on" end %>
                 <% end) %>
               }<% end) %>
               <% end) end %>

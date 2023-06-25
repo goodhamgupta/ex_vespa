@@ -6,7 +6,6 @@ defmodule ExVespa.Package.Struct do
   <https://docs.vespa.ai/en/reference/schema-reference.html#struct>`__
   for more detailed information about structs.
   """
-  alias ExVespa.Package.Summary
   alias ExVespa.Package.Field
   alias __MODULE__
 
@@ -38,7 +37,7 @@ defmodule ExVespa.Package.Struct do
   ## Examples
 
     iex> alias ExVespa.Package.Struct
-    iex> struct = Struct.new("my_struct")
+    iex> Struct.new("my_struct")
     %ExVespa.Package.Struct{
       fields: [],
       name: "my_struct"
@@ -46,7 +45,7 @@ defmodule ExVespa.Package.Struct do
 
     # Add fields to struct
     iex> alias ExVespa.Package.{Struct, Field}
-    iex> struct = Struct.new("my_struct", [Field.new("my_field", "string")])
+    iex> Struct.new("my_struct", [Field.new("my_field", "string")])
     %ExVespa.Package.Struct{
       fields: [
         %ExVespa.Package.Field{
