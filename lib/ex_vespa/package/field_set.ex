@@ -62,4 +62,11 @@ defmodule ExVespa.Package.FieldSet do
   def %FieldSet{name: lname, fields: lfields} = %FieldSet{name: rname, fields: rfields} do
     lname == rname and lfields == rfields
   end
+
+  def fields_to_text(%FieldSet{fields: fields}) when is_nil(fields), do: ""
+
+  def fields_to_text(%FieldSet{fields: fields}) do
+    Enum.join(fields, ", ")
+  end
+
 end

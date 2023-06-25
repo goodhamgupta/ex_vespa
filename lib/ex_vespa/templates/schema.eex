@@ -1,4 +1,4 @@
-<% alias ExVespa.Package.{Summary, Document, Field, StructField} %>schema <%= schema.name %> {
+<% alias ExVespa.Package.{Summary, Document, Field, StructField, FieldSet} %>schema <%= schema.name %> {
     document <%= if schema.document.inherits, do: "#{schema.name}" %> {
         <%= Enum.map(Document.fields(schema.document), fn field -> %>field <%= field.name %> type <%= field.type %> {
             <%= if field.indexing, do: "indexing: #{Field.indexing_to_text(field)}" %><%= if field.index do %>
@@ -84,6 +84,11 @@
     }
 <%= Enum.map(schema.imported_fields, fn {key, value} -> %>
   import field <%= value.reference_field %>.<%= value.field_to_import %> as <%= "#{key} {}" %>
+<% end) %>
+<%= Enum.map(schema.fieldsets, fn {key, value} -> %>
+  fieldset <%= key %> {
+    <%= FieldSet.fields_to_text(value) %>
+  }
 <% end) %>
 <%= if schema.models do %>
   <%= Enum.map(schema.models, fn model -> %>
