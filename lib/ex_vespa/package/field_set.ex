@@ -68,5 +68,4 @@ defmodule ExVespa.Package.FieldSet do
   def fields_to_text(%FieldSet{fields: fields}) do
     Enum.join(fields, ", ")
   end
-
 end

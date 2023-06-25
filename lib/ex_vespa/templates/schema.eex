@@ -103,4 +103,17 @@
   }
   <% end) %>
 <% end %>
+<%= Enum.map(schema.document_summaries, fn document_summary -> %>
+  document-summary <%= document_summary.name %> <%= if document_summary.inherits do "inherits #{document_summary.inherits}" end%>  {
+  <%= if document_summary.summary_fields do %>
+    <%= Enum.map(document_summary.summary_fields, fn summary -> %>
+    <%= Enum.map(Summary.as_lines(summary), fn line -> %>
+    <%= line %>
+    <% end) %>
+    <% end) %>
+  <% end %>
+  <%= if document_summary.from_disk do document_summary.from_disk end %>
+  <%= if document_summary.omit_summary_fields do document_summary.omit_summary_fields end %>
+  }
+<% end) %>
 }
