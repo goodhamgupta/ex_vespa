@@ -125,6 +125,21 @@
   <% end) %>
   }
   <% end %>
+  <%= if value.first_phase do %>
+  first-phase {
+    expression {
+      <%= value.first_phase %>
+    }
+  }
+  <% end %>
+  <%= if value.second_phase do %>
+  second-phase {
+    rerank-count: <%= value.second_phase.rerank_count %>
+    expression {
+      <%= value.second_phase.expression %>
+    }
+  }
+  <% end %>
 }
 <% end) %>
 <%= Enum.map(schema.document_summaries, fn document_summary -> %>
