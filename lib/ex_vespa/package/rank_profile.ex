@@ -37,7 +37,7 @@ defmodule ExVespa.Package.RankProfile do
           weight: list(Tuple.t()) | nil,
           rank_type: list(Tuple.t()) | nil,
           rank_properties: list(Tuple.t()) | nil,
-          inputs: list(Tuple.t()) | nil,
+          inputs: list(Tuple.t()) | nil
         }
 
   defp validate(%RankProfile{name: name}) when is_nil(name) do

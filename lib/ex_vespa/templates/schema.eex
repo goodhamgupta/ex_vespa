@@ -117,7 +117,7 @@
   <% end %>
   <%= if value.functions do %>
   functions {<%= Enum.map(value.functions, fn function -> %>
-    function <%= function.name %>(<%= Function.args_to_text(function) %>) {
+    function <%= function.name %> <%= "(#{Function.args_to_text(function)})" %> {
       expression {
         <%= function.expression %>
       }
