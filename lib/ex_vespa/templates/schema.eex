@@ -140,6 +140,15 @@
     }
   }
   <% end %>
+  <%= if value.weight do Enum.map(value.weight, fn {key_weight, value_weight} -> %>
+  weight <%= "#{key_weight}: #{value_weight}" %> <% end) end%>
+  <%= if value.rank_type do Enum.map(value.rank_type, fn {key_rank_type, value_rank_type} -> %>
+  rank-type <%= "#{key_rank_type}: #{value_rank_type}" %> <% end) end%>
+  <%= if value.rank_properties do %>
+  rank-properties {
+  <%= Enum.map(value.rank_properties, fn {key_rank_properties, value_rank_properties} -> %>
+    <%= "#{key_rank_properties}: #{value_rank_properties}" %> <% end) %>
+  }<% end %>
 }
 <% end) %>
 <%= Enum.map(schema.document_summaries, fn document_summary -> %>
