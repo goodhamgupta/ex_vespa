@@ -29,6 +29,7 @@ defmodule ExVespa.Package.ApplicationPackage do
     :model_ids,
     :model_configs,
     :stateless_model_evaluation,
+    :models,
     :create_schema_by_default,
     :create_query_profile_by_default,
     :configurations,
@@ -45,6 +46,7 @@ defmodule ExVespa.Package.ApplicationPackage do
           model_ids: list(String.t()) | [],
           model_configs: map(),
           stateless_model_evaluation: boolean(),
+          models: map() | {},
           create_schema_by_default: boolean(),
           create_query_profile_by_default: boolean(),
           configurations: list(Configuration.t()) | nil,
@@ -135,6 +137,7 @@ defmodule ExVespa.Package.ApplicationPackage do
       model_ids: Keyword.get(opts, :model_ids, []),
       model_configs: Keyword.get(opts, :model_configs, %{}),
       stateless_model_evaluation: Keyword.get(opts, :stateless_model_evaluation, false),
+      models: Keyword.get(opts, :models, {}),
       create_schema_by_default: Keyword.get(opts, :create_schema_by_default, false),
       create_query_profile_by_default: Keyword.get(opts, :create_query_profile_by_default, false),
       configurations: Keyword.get(opts, :configurations, []),
@@ -155,10 +158,42 @@ defmodule ExVespa.Package.ApplicationPackage do
   """
   def schemas(%ApplicationPackage{schema: schema}), do: Map.values(schema)
 
+  @doc """
+  Get schema by name in app package
+
+  ## Examples
+
+    iex> alias ExVespa.Package.{ApplicationPackage, Schema, Document}
+    iex> app_package = ApplicationPackage.new("my_app")
+    iex> ApplicationPackage.get_schema(app_package, "my_app")
+    %Schema{name: "my_app", document: %Document{_fields: %{}, inherits: [], _structs: %{}}, fieldsets: %{}, rank_profiles: %{}, models: [], global_document: false, imported_fields: %{}, document_summaries: []}
+  """
+  def get_schema(app_package, name \\ nil)
+
+  def get_schema(%ApplicationPackage{schema: schema}, _) when length(schema) == 0 do
+    raise ArgumentError, "No schemas defined in application package"
+  end
+
+  def get_schema(%ApplicationPackage{schema: schema}, name) when is_nil(name) do
+    Map.values(schema) |> List.first()
+  end
+
+  def get_schema(%ApplicationPackage{schema: schema}, name) do
+    Map.get(schema, name)
+  end
+
   def add_schema(%ApplicationPackage{schema: schema} = application_package, schema_to_add) do
     new_schema = Map.put(schema, schema_to_add.name, schema_to_add)
 
     %{application_package | schema: new_schema}
+  end
+
+  def get_model(%ApplicationPackage{models: _models}, name) when is_nil(name) do
+    raise ArgumentError, "Model name cannot be nil"
+  end
+
+  def get_model(%ApplicationPackage{models: models}, name) do
+    Map.fetch(models, name)
   end
 
   @doc ~S"""
@@ -268,5 +303,58 @@ defmodule ExVespa.Package.ApplicationPackage do
     schemas = ApplicationPackage.schemas(app_package)
 
     "#ExVespa.Package.ApplicationPackage<name: #{name}, schemas: #{inspect(schemas)} query_profile: #{inspect(query_profile)} query_profile_type: #{inspect(query_profile_type)}>"
+  end
+
+  defp setup_dirs(%ApplicationPackage{} = app_package) do
+    dir = Path.join(System.tmp_dir!(), "vespa_package_#{app_package.name}")
+
+    if File.exists?(dir) do
+      File.rm_rf!(dir)
+    end
+
+    File.mkdir!(dir)
+    dir |> Path.join("schemas") |> File.mkdir!()
+    dir |> Path.join("files") |> File.mkdir!()
+    dir
+  end
+
+  def to_files(%ApplicationPackage{} = app_package) do
+    dir = setup_dirs(app_package)
+    # Write services file
+    dir
+    |> Path.join("services.xml")
+    |> File.write!(ApplicationPackage.services_to_text(app_package))
+
+    # Write validation overrides file
+    dir
+    |> Path.join("validation-overrides.xml")
+    |> File.write!(ApplicationPackage.validations_to_text(app_package))
+
+    # Iterate over schemas and write them to disk
+    Enum.each(ApplicationPackage.schemas(app_package), fn schema ->
+      dir
+      |> Path.join("schemas")
+      |> Path.join("#{schema.name}.sd")
+      |> File.write!(Schema.schema_to_text(schema))
+    end)
+
+    # TODO: Add support to write onnx files to disk
+
+    if app_package.query_profile do
+      path = dir |> Path.join("search/query-profiles/")
+      File.mkdir_p!(path)
+
+      path
+      |> Path.join("default.xml")
+      |> File.write!(ApplicationPackage.query_profile_to_text(app_package))
+
+      types_path = Path.join(path, "types")
+      File.mkdir_p!(types_path)
+
+      File.write(
+        types_path |> Path.join("root.xml"),
+        ApplicationPackage.query_profile_type_to_text(app_package)
+      )
+    end
   end
 end

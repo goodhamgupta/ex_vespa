@@ -1,6 +1,8 @@
 import_if_available(Ecto.Query)
 import_if_available(Ecto.Changeset)
 
+alias ExVespa.Package.ApplicationPackage
+
 defmodule AC do
   IEx.configure(
     colors: [
@@ -16,7 +18,8 @@ defmodule AC do
       doc_code: :green,
       doc_inline_code: :magenta,
       doc_headings: [:cyan, :underline],
-      doc_title: [:cyan, :bright, :underline]
+      doc_title: [:cyan, :bright, :underline],
+      history_size: 50
     ],
     default_prompt:
       [
