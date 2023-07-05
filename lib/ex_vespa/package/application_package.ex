@@ -315,11 +315,15 @@ defmodule ExVespa.Package.ApplicationPackage do
     File.mkdir!(dir)
     dir |> Path.join("schemas") |> File.mkdir!()
     dir |> Path.join("files") |> File.mkdir!()
-    dir
+    qp_path = dir |> Path.join("search/query-profiles/")
+    File.mkdir_p!(qp_path)
+    types_path = Path.join(qp_path, "types")
+    File.mkdir_p!(types_path)
+    {dir, qp_path}
   end
 
   def to_files(%ApplicationPackage{} = app_package) do
-    dir = setup_dirs(app_package)
+    {dir, qp_path} = setup_dirs(app_package)
     # Write services file
     dir
     |> Path.join("services.xml")
@@ -341,20 +345,24 @@ defmodule ExVespa.Package.ApplicationPackage do
     # TODO: Add support to write onnx files to disk
 
     if app_package.query_profile do
-      path = dir |> Path.join("search/query-profiles/")
-      File.mkdir_p!(path)
-
-      path
+      qp_path
       |> Path.join("default.xml")
       |> File.write!(ApplicationPackage.query_profile_to_text(app_package))
 
-      types_path = Path.join(path, "types")
-      File.mkdir_p!(types_path)
-
       File.write(
-        types_path |> Path.join("root.xml"),
+        qp_path |> Path.join("types/root.xml"),
         ApplicationPackage.query_profile_type_to_text(app_package)
       )
     end
+
+    IO.puts("Files available at: #{dir}")
+    dir
+  end
+
+  def to_zipfile(%ApplicationPackage{} = app_package, zip_name) do
+    dir = to_files(app_package)
+    files = File.ls!(dir) |> Enum.map(&String.to_charlist/1)
+    {:ok, filename} = :zip.create("#{zip_name}", files)
+    {:ok, filename}
   end
 end
