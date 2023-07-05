@@ -362,7 +362,7 @@ defmodule ExVespa.Package.ApplicationPackage do
   def to_zipfile(%ApplicationPackage{} = app_package, zip_name) do
     dir = to_files(app_package)
     files = File.ls!(dir) |> Enum.map(&String.to_charlist/1)
-    {:ok, filename} = :zip.create("#{zip_name}", files)
+    {:ok, filename} = :zip.create("#{zip_name}", files, cwd: dir)
     {:ok, filename}
   end
 end
