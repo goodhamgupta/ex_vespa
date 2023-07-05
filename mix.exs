@@ -14,7 +14,7 @@ defmodule ExVespa.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :eex]
+      extra_applications: [:logger, :eex, :docker]
     ]
   end
 
@@ -22,7 +22,8 @@ defmodule ExVespa.MixProject do
   defp deps do
     [
       {:req, "~> 0.1.0"},
-      {:retry, "~> 0.13.0"}
+      {:retry, "~> 0.13.0"},
+      {:docker, "~> 0.4.0"}
     ]
   end
 end
