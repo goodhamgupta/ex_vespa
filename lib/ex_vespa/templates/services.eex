@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services version="1.0">
 <%= if configurations != nil do Enum.map(configurations, fn config -> ExVespa.Package.ApplicationConfiguration.to_text(config) end) end %>
-    <container id=<%= application_name %>_container version="1.0"><%= if schemas do %>
+    <container id="<%= application_name %>_container" version="1.0"><%= if schemas do %>
         <search></search>
         <document-api></document-api><% end %><%= if stateless_model_evaluation do %>
         <model_evaluation/><% end %>
     </container><%= if schemas != nil do %>
-    <content id=<%= application_name %>_content version="1.0">
+    <content id="<%= application_name %>_content" version="1.0">
         <redundancy reply-after="1">1</redundancy>
         <documents><%= Enum.map(schemas, fn schema -> %>
             <%= if schema.global_document do %><document type="<%= schema.name %>" mode="index" global="true"></document>

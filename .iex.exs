@@ -2,6 +2,10 @@ import_if_available(Ecto.Query)
 import_if_available(Ecto.Changeset)
 
 alias ExVespa.Package.ApplicationPackage
+alias ExVespa.Deployment.VespaDocker
+
+app = ApplicationPackage.new("test")
+vespa_docker = VespaDocker.new()
 
 defmodule AC do
   IEx.configure(

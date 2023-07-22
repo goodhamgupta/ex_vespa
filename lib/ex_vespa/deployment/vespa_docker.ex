@@ -20,8 +20,8 @@ defmodule ExVespa.Deployment.VespaDocker do
     container_memory: 512,
     output_file: "Dockerfile",
     container_image: "vespaengine/vespa",
-    cfgsrv_port: 19070,
-    debug_port: 19071
+    cfgsrv_port: 19071,
+    debug_port: 5005
   ]
 
   @cfg_server_timeout 30_000
@@ -83,31 +83,45 @@ defmodule ExVespa.Deployment.VespaDocker do
     container_id = Docker.find_ids(vespa_docker.container_name) |> List.first()
 
     if container_id do
-      {:ok, container_id, vespa_docker.container_name}
+      container = Docker.Containers.inspect(container_id)
+      {:ok, %{vespa_docker | container: container}}
     else
-      {:ok, container} =
-        Docker.Containers.start(vespa_docker.container_image, %{
-          "HostConfig" => %{
-            "PortBindings" => %{
-              "8080/tcp" => [%{"HostPort" => "#{vespa_docker.port}"}]
+      %{"Id" => container_id, "Warnings" => _warnings} =
+        Docker.Containers.create(
+          %{
+            "Image" => vespa_docker.container_image,
+            "ExposedPorts" => %{
+              "8080/tcp" => %{},
+              "19071/tcp" => %{}
             },
-            "Memory" => vespa_docker.container_memory
-          }
-        })
+            "HostConfig" => %{
+              "PortBindings" => %{
+                "8080/tcp" => [%{"HostPort" => "#{vespa_docker.port}"}]
+              },
+              "Memory" => vespa_docker.container_memory * 100_0000
+            }
+          },
+          vespa_docker.container_name
+        )
 
-      container = Docker.Containers.inspect(container)
-      container_id = container["Id"]
+      IO.puts("Created container #{container_id}")
+      IO.puts("Starting container #{container_id}")
+      Docker.Containers.start(container_id)
+
+      container = Docker.Containers.inspect(container_id)
       container_name = Docker.Names.extract_tag(container["Name"])
-      {:ok, container_id, container_name}
+      {:ok, %{vespa_docker | container: container, container_name: container_name}}
     end
   end
 
   @spec check_configuration_server(VespaDocker.t()) :: true | false | {:error, String.t()}
   defp check_configuration_server(%VespaDocker{container: container}) do
-    container_ip = container["NetworkSettings"]["IPAddress"]
-    {:ok, response} = Req.get!("http://#{container_ip}:19071/ApplicationStatus")
+    # container_ip = container["NetworkSettings"]["IPAddress"]
+    # TODO: container_ip results in timeouts for some reason. For now, since the ports are exposed
+    # to the local machine, we can just use localhost
+    response = Req.get!("http://localhost:19071/ApplicationStatus")
 
-    if response.status_code == 200 do
+    if response.status == 200 do
       true
     else
       false
@@ -144,22 +158,24 @@ defmodule ExVespa.Deployment.VespaDocker do
          %ApplicationPackage{} = app_package,
          _debug
        ) do
-    run_vespa_engine_container(vespa_docker)
+    {:ok, vd} = run_vespa_engine_container(vespa_docker)
 
-    container_ip = vespa_docker.container["NetworkSettings"]["IPAddress"]
-    wait_for_config_server_start(app_package, @cfg_server_timeout)
+    container_ip = vd.container["NetworkSettings"]["IPAddress"]
+    wait_for_config_server_start(vd, @cfg_server_timeout)
 
-    {:ok, zip_fname} = ApplicationPackage.to_zipfile(app_package, "vespa.zip")
+    {:ok, zip_data} = ApplicationPackage.to_zip(app_package)
 
+    # TODO: Same container_ip problem as above
     response =
       Req.post!(
-        "http://#{container_ip}:#{vespa_docker.cfgsrv_port}/application/v2/tenant/default/prepareandactivate",
-        headers: [{"Content-Type", "application/zip"}],
-        data: zip_fname
+        "http://localhost:#{vd.cfgsrv_port}/application/v2/tenant/default/prepareandactivate",
+        zip_data,
+        headers: [{"content-type", "application/zip"}]
       )
 
-    if response.status_code == 200 do
+    if response.status == 200 do
       IO.puts("Deployed application #{app_package.name}")
+      {:ok, vd}
     else
       raise RuntimeError,
             "Failed to deploy application #{app_package.name}. Response: #{inspect(response)}"
