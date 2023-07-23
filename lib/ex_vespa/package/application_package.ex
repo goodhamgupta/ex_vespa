@@ -82,6 +82,7 @@ defmodule ExVespa.Package.ApplicationPackage do
         create_schema_by_default: false,
         model_configs: %{},
         model_ids: [],
+        models: %{},
         name: "my_app",
         query_profile: %ExVespa.Package.QueryProfile{name: "default", type: "root", fields: []},
         query_profile_type: %ExVespa.Package.QueryProfileType{name: "root", fields: []},
@@ -137,7 +138,7 @@ defmodule ExVespa.Package.ApplicationPackage do
       model_ids: Keyword.get(opts, :model_ids, []),
       model_configs: Keyword.get(opts, :model_configs, %{}),
       stateless_model_evaluation: Keyword.get(opts, :stateless_model_evaluation, false),
-      models: Keyword.get(opts, :models, {}),
+      models: Keyword.get(opts, :models, %{}),
       create_schema_by_default: Keyword.get(opts, :create_schema_by_default, false),
       create_query_profile_by_default: Keyword.get(opts, :create_query_profile_by_default, false),
       configurations: Keyword.get(opts, :configurations, []),
@@ -248,7 +249,7 @@ defmodule ExVespa.Package.ApplicationPackage do
     iex> alias ExVespa.Package.ApplicationPackage
     iex> app_package = ApplicationPackage.new("my_app")
     iex> ApplicationPackage.services_to_text(app_package)
-    ~s(<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<services version=\"1.0\">\n\n\n    <container id=my_app_container version=\"1.0\">\n        <search></search>\n        <document-api></document-api>\n    </container>\n    <content id=my_app_content version=\"1.0\">\n        <redundancy reply-after=\"1\">1</redundancy>\n        <documents>\n        \n            <document type=\"my_app\" mode=\"index\"></document>\n        \n        </documents>\n        <nodes>\n            <node hostalias=\"node1\" distribution-key=\"0\"/>\n        </nodes>\n    </content>\n</services>\n)
+    ~s(<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<services version=\"1.0\">\n\n    <container id=\"my_app_container\" version=\"1.0\">\n        <search></search>\n        <document-api></document-api>\n    </container>\n    <content id=\"my_app_content\" version=\"1.0\">\n        <redundancy reply-after=\"1\">1</redundancy>\n        <documents>\n            <document type=\"my_app\" mode=\"index\"></document>\n        </documents>\n        <nodes>\n            <node hostalias=\"node1\" distribution-key=\"0\"/>\n        </nodes>\n    </content>\n</services>\n)
   """
   def services_to_text(
         %ApplicationPackage{
