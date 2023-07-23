@@ -23,7 +23,8 @@ defmodule ExVespa.Deployment.VespaDocker do
     port: 8080,
     container: %{},
     container_name: "vespa",
-    container_memory: 512, # in MB
+    # in MB
+    container_memory: 512,
     output_file: "Dockerfile",
     container_image: "vespaengine/vespa",
     cfgsrv_port: 19071,
