@@ -1,4 +1,10 @@
 defmodule ExVespa.Deployment.VespaDocker do
+  @moduledoc """
+  This module is responsible for deploying a Vespa application to a Docker container.
+  It will zip the contents of the supplied ApplicationPackage, and send it to the container.
+  If the container is not running, it will be started.
+  """
+
   alias __MODULE__
   alias ExVespa.Package.ApplicationPackage
 
@@ -17,7 +23,7 @@ defmodule ExVespa.Deployment.VespaDocker do
     port: 8080,
     container: %{},
     container_name: "vespa",
-    container_memory: 512,
+    container_memory: 512, # in MB
     output_file: "Dockerfile",
     container_image: "vespaengine/vespa",
     cfgsrv_port: 19071,
@@ -114,6 +120,9 @@ defmodule ExVespa.Deployment.VespaDocker do
     end
   end
 
+  @doc """
+  Check if the config server is running by polling the config server status page
+  """
   @spec check_configuration_server(VespaDocker.t()) :: true | false | {:error, String.t()}
   defp check_configuration_server(%VespaDocker{container: container}) do
     # container_ip = container["NetworkSettings"]["IPAddress"]
@@ -149,7 +158,7 @@ defmodule ExVespa.Deployment.VespaDocker do
   Wait for the config server to start. This is done by polling the config server
   """
   @spec wait_for_config_server_start(VespaDocker.t(), pos_integer()) :: true
-  def wait_for_config_server_start(%VespaDocker{container: container}, max_wait) do
+  defp wait_for_config_server_start(%VespaDocker{container: container}, max_wait) do
     do_wait_for_config_server(%VespaDocker{container: container}, 0, max_wait)
   end
 
@@ -182,10 +191,16 @@ defmodule ExVespa.Deployment.VespaDocker do
     end
   end
 
+  @doc """
+  Deploy an application package to a Vespa Docker container
+  """
   def deploy(%VespaDocker{} = vespa_docker, %ApplicationPackage{} = app_package, debug \\ false) do
     _deploy_data(vespa_docker, app_package, debug)
   end
 
+  @doc """
+  Stop vespa docker container
+  """
   def stop_services(%VespaDocker{container: container}) when is_nil(container) do
     raise RuntimeError, "No container to stop"
   end
