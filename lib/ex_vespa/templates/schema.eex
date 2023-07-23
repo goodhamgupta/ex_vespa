@@ -80,7 +80,6 @@
               <% end) end %>
             }
         <% end) %>
-        }
     }
 <%= Enum.map(schema.imported_fields, fn {key, value} -> %>
   import field <%= value.reference_field %>.<%= value.field_to_import %> as <%= "#{key} {}" %>
