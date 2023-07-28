@@ -41,7 +41,7 @@ defmodule ExVespa.Application.VespaSync do
         base_url
       end
 
-    {:ok, {{http_method, status_code, msg}, headers, response}} =
+    {:ok, {{_http_method, status_code, _msg}, _headers, response}} =
       :httpc.request(:get, {endpoint, []}, [], [{:ssl, [{:certfile, vespa_sync.cert}]}])
 
     if status_code == 200 do
@@ -55,7 +55,7 @@ defmodule ExVespa.Application.VespaSync do
     base_url = "#{vespa_sync.app.end_point}/model-evaluation/v1"
     endpoint = "#{base_url}/#{model_id}/#{function_name}/eval?#{encoded_tokens}"
 
-    {:ok, {{http_method, status_code, msg}, headers, response}} =
+    {:ok, {{_http_method, status_code, _msg}, _headers, response}} =
       :httpc.request(
         :post,
         {endpoint, []},
@@ -85,7 +85,7 @@ defmodule ExVespa.Application.VespaSync do
 
     req_headers = [{"Content-Type", "application/json"}]
 
-    {:ok, {{http_method, status_code, msg}, headers, response}} =
+    {:ok, {{_http_method, status_code, _msg}, _headers, response}} =
       :httpc.request(
         :put,
         {endpoint, req_headers},
@@ -109,7 +109,7 @@ defmodule ExVespa.Application.VespaSync do
 
   def query(%VespaSync{} = vespa_sync, body \\ %{}) do
     # Make post request to search_end_point
-    {:ok, {{http_method, status_code, msg}, headers, response}} =
+    {:ok, {{_http_method, status_code, _msg}, _headers, response}} =
       :httpc.request(
         :post,
         {vespa_sync.app.search_end_point, []},
@@ -139,7 +139,7 @@ defmodule ExVespa.Application.VespaSync do
 
     endpoint = "#{base_url}/#{cur_namespace}/#{schema}/docid/#{data_id}"
 
-    {:ok, {{http_method, status_code, msg}, headers, response}} =
+    {:ok, {{_http_method, status_code, _msg}, _headers, response}} =
       :httpc.request(
         :delete,
         {endpoint, []},
@@ -173,7 +173,7 @@ defmodule ExVespa.Application.VespaSync do
     endpoint =
       "#{base_url}/#{cur_namespace}/#{schema}/docid/?cluster=#{content_cluster_name}&selection=true"
 
-    {:ok, {{http_method, status_code, msg}, headers, response}} =
+    {:ok, {{_http_method, status_code, _msg}, _headers, response}} =
       :httpc.request(
         :delete,
         {endpoint, []},
@@ -206,7 +206,7 @@ defmodule ExVespa.Application.VespaSync do
 
     endpoint = "#{base_url}/#{cur_namespace}/#{schema}/docid/#{data_id}"
 
-    {:ok, {{http_method, status_code, msg}, headers, response}} =
+    {:ok, {{_http_method, status_code, _msg}, _headers, response}} =
       :httpc.request(
         :get,
         {endpoint, []},
@@ -242,7 +242,7 @@ defmodule ExVespa.Application.VespaSync do
     req_headers = [{"Content-Type", "application/json"}]
     vespa_format = %{fields: Enum.map(fields, fn {k, v} -> {k, %{assign: v}} end)}
 
-    {:ok, {{http_method, status_code, msg}, headers, response}} =
+    {:ok, {{_http_method, status_code, _msg}, _headers, response}} =
       :httpc.request(
         :put,
         {endpoint, req_headers},
